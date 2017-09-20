@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}
+{% block footer %}
+<hr>
+<div class="footer">
+  <A HREF="{{ url_for('ox_profile.index') }}">Ox Profile</A>
+</div>
+{{ super() }}
+{% endblock %}

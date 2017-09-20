@@ -1,0 +1,28 @@
+{% extends "ox_prof_layout.html" %}
+{% block body %}
+
+{% set title = 'Ox Profile' %}
+
+<div>
+  <h2>Ox Profile</h2>
+  <p>
+    Welcome to Ox Profile user interface and administration page.
+  </p>
+</div>
+<div>  
+  The following are some useful commands:
+  <UL>
+  {% for (cmd_name, cmd_url) in commands %}
+  <LI>
+    <A HREF="{{ cmd_url }}">{{ cmd_name }}</A>
+  </LI>
+  {% endfor %}
+  </UL>
+</div>
+<hr>
+<div>
+  See the <A HREF="https://github.com/emin63/ox_profile">ox_profile</A>
+  github site for more information.
+</div>
+
+{% endblock %}

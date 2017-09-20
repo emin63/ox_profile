@@ -1,0 +1,34 @@
+
+<!doctype html>
+<!-- top level layout.html for ox_profile. -->
+<!-- Usually this will be overriden by site layout, but this is -->
+<!-- provided in case the main site does not have a layout.html tempalte. -->
+<html>
+  <head>
+    {% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {{ title }} {% endblock %}</title>
+    {% endblock %}
+  </head>
+  <body>
+    {% block top_nav %}    
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <hr>
+    <ul class=flashes>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    <hr>
+    {% endif %}
+    {% endwith %}
+    {% endblock %}
+    {% block body %}
+    {% endblock %}    
+    {% block footer %}
+    {% endblock %}
+  </body>
+</html>
+
+

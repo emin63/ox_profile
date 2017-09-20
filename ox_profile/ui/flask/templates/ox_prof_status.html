@@ -1,0 +1,52 @@
+{% extends "ox_prof_layout.html" %}
+{% block body %}
+
+<div>
+  <h2>Ox Profile Status</h2>
+</div>
+<hr>
+<div>
+  {% if launcher.is_paused() %}
+  <p>
+    The profiler is paused. Use the
+    <A HREF="{{ url_for('ox_profile.unpause') }}">unpause</A> command to
+    unpause or start the profiler.
+  </p>
+  {% else %}
+  <p>
+    The profiler is running. Use the
+    <A HREF="{{ url_for('ox_profile.pause') }}">pause</A> command to
+    pause it.
+    <form action="{{ url_for('ox_profile.set_interval') }}">
+      Using sampling interval of
+      <input style="width: 7em;" type="number" name="interval"
+	     min="0.0001" max="10" step="0.0001"
+	     value="{{launcher.interval}}">
+      <input type="submit" value="(Change)"> 
+    </form>
+    <br>
+    Sampling stats: {{ launcher.tracker.stats() }}
+  </p>
+  {% endif %}
+</div>
+<div>
+  <form action="{{ url_for('ox_profile.status') }}">
+    Showing top {{'{:,}'.format(query|length)}} functions
+    ({{'{:,}'.format(total_records)}} distinct calls)
+    limited to max
+    <input style="width: 4em;" type="number" name="max_records"
+	   value="{{request.args.get('max_records', 50)}}">
+    <input type="submit" value="(Redo)"> 
+    
+    
+  </form> 
+  <OL>
+    {% for item in query %}
+    <LI>
+      {{ '%s: %s' % (item.name, item.hits) }}
+    </LI>
+    {% endfor %}
+  </OL>
+</div>
+
+{% endblock %}
