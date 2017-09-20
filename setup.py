@@ -16,14 +16,14 @@ def get_readme():
     'Get the long description from the README file'
 
     here = path.abspath(path.dirname(__file__))
-    with open(path.join(here, 'README.md'), encoding='utf-8') as my_fd:
+    with open(path.join(here, 'README.rst'), encoding='utf-8') as my_fd:
         result = my_fd.read()
 
     return result
 
 setup(
     name='ox_profile',
-    version='0.1.0',
+    version='0.1.1',
     description='Tools for statistical profiling.',
     long_description=get_readme(),
     url='http://github.com/emin63/ox_profile',
