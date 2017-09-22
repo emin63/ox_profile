@@ -1,0 +1,2 @@
+include ox_profile/ui/flask/templates/*
+include ox_profile/ui/flask/static/*
