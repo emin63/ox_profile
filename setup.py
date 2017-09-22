@@ -23,12 +23,13 @@ def get_readme():
 
 setup(
     name='ox_profile',
-    version='0.1.5',
+    version='0.1.6',
     description='Tools for statistical profiling.',
     long_description=get_readme(),
     url='http://github.com/emin63/ox_profile',
     author='Emin Martinian',
     author_email='emin.martinian@gmail.com',
+    include_package_data=True,
     license='MIT',
     classifiers=[
         'Development Status :: 3 - Alpha',
