@@ -3,6 +3,36 @@
 
 import re
 import threading
+import logging
+
+
+class LoggingLock(object):
+
+    def __init__(self, name, log_func=None):
+        self.name = name
+        self.lock = threading.Lock()
+        self.log_func = log_func if log_func else logging.debug
+
+    def acquire(self, msg=''):
+        self.log_func('Acquire lock %s; %s' % (self.name, msg))
+        self.lock.acquire()
+
+    def release(self, msg=''):
+        self.log_func('Release lock %s; %s' % (self.name, msg))
+        self.lock.release()
+
+    def __call__(self, msg):
+        self.log_func('For lock %s: %s' % (self.name, msg))
+        return self
+
+    def __enter__(self):
+        self.acquire()
+        return self
+
+    def __exit__(self, mytype, value, traceback):
+        dummy_ignore = mytype, value, traceback
+        self.release()
+        return self
 
 
 class ProfileRecord(object):
@@ -25,8 +55,8 @@ class CountingRecorder(object):
     """
 
     def __init__(self):
-        self.my_lock = threading.Lock()
-        with self.my_lock:
+        self.my_lock = LoggingLock('CountingRecorder')
+        with self.my_lock('initializing'):
             self.my_db = {}
 
     def record(self, measurement):
@@ -41,7 +71,7 @@ class CountingRecorder(object):
                   recorders may track different things about a measurement.
 
         """
-        with self.my_lock:
+        with self.my_lock('record'):
             record = self.my_db.get(measurement.name, 0)
             self.my_db[measurement.name] = record + 1
 
@@ -68,7 +98,7 @@ class CountingRecorder(object):
         """
         regexp = re.compile(re_filter)
         calls = {}
-        with self.my_lock:
+        with self.my_lock('query'):
             num_records = len(self.my_db)
             for name, item in self.my_db.items():
                 name_list = name.split(';')
