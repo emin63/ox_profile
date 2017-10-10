@@ -2,6 +2,7 @@
 """
 
 import re
+import threading
 
 
 class ProfileRecord(object):
@@ -24,7 +25,9 @@ class CountingRecorder(object):
     """
 
     def __init__(self):
-        self.my_db = {}
+        self.my_lock = threading.Lock()
+        with self.my_lock:
+            self.my_db = {}
 
     def record(self, measurement):
         """Record a measurement.
@@ -38,8 +41,9 @@ class CountingRecorder(object):
                   recorders may track different things about a measurement.
 
         """
-        record = self.my_db.get(measurement.name, 0)
-        self.my_db[measurement.name] = record + 1
+        with self.my_lock:
+            record = self.my_db.get(measurement.name, 0)
+            self.my_db[measurement.name] = record + 1
 
     def query(self, re_filter='.*', max_records=10):
         """Query the database of measurements.
@@ -64,14 +68,15 @@ class CountingRecorder(object):
         """
         regexp = re.compile(re_filter)
         calls = {}
-        num_records = len(self.my_db)
-        for name, item in self.my_db.items():
-            name_list = name.split(';')
-            for fname in name_list:
-                if regexp.search(fname):
-                    calls[fname] = calls.get(fname, 0) + item
-        my_hits = list(reversed(sorted(calls.items(),
-                                       key=lambda pair: pair[1])))
-        result = [ProfileRecord(name, hits) for name, hits in my_hits[
-            :max_records]]
-        return result, num_records
+        with self.my_lock:
+            num_records = len(self.my_db)
+            for name, item in self.my_db.items():
+                name_list = name.split(';')
+                for fname in name_list:
+                    if regexp.search(fname):
+                        calls[fname] = calls.get(fname, 0) + item
+            my_hits = list(reversed(sorted(calls.items(),
+                                           key=lambda pair: pair[1])))
+            result = [ProfileRecord(name, hits) for name, hits in my_hits[
+                :max_records]]
+            return result, num_records
