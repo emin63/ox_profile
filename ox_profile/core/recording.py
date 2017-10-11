@@ -98,9 +98,14 @@ class CountingRecorder(object):
         """
         regexp = re.compile(re_filter)
         calls = {}
+        # Lock so we don't mess with db during query.
+        # *IMPORTANT: be careful in code below to not do anything to
+        # call self.record or anything else which would try to acquire
+        # self.db_lock otherwise you will deadlock
         with self.db_lock('query'):
             num_records = len(self.my_db)
-            for name, item in self.my_db.items():
+            # Use explicit list in case dict changes during iteration
+            for name, item in list(self.my_db.items()):
                 name_list = name.split(';')
                 for fname in name_list:
                     if regexp.search(fname):
