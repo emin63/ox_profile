@@ -23,7 +23,7 @@ def get_readme():
 
 setup(
     name='ox_profile',
-    version='0.1.7',
+    version='0.1.8',
     description='Tools for statistical profiling.',
     long_description=get_readme(),
     url='http://github.com/emin63/ox_profile',
