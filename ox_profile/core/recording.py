@@ -14,15 +14,15 @@ class LoggingLock(object):
         self.log_func = log_func if log_func else logging.debug
 
     def acquire(self, msg=''):
-        self.log_func('Acquire lock %s; %s' % (self.name, msg))
+        self.log_func('Acquire lock %s; %s', self.name, msg)
         self.lock.acquire()
 
     def release(self, msg=''):
-        self.log_func('Release lock %s; %s' % (self.name, msg))
+        self.log_func('Release lock %s; %s', self.name, msg)
         self.lock.release()
 
     def __call__(self, msg):
-        self.log_func('For lock %s: %s' % (self.name, msg))
+        self.log_func('For lock %s: %s', self.name, msg)
         return self
 
     def __enter__(self):
