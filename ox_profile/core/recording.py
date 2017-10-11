@@ -55,8 +55,8 @@ class CountingRecorder(object):
     """
 
     def __init__(self):
-        self.my_lock = LoggingLock('CountingRecorder')
-        with self.my_lock('initializing'):
+        self.db_lock = LoggingLock('CountingRecorder')
+        with self.db_lock('initializing'):
             self.my_db = {}
 
     def record(self, measurement):
@@ -71,7 +71,7 @@ class CountingRecorder(object):
                   recorders may track different things about a measurement.
 
         """
-        with self.my_lock('record'):
+        with self.db_lock('record'):
             record = self.my_db.get(measurement.name, 0)
             self.my_db[measurement.name] = record + 1
 
@@ -98,7 +98,7 @@ class CountingRecorder(object):
         """
         regexp = re.compile(re_filter)
         calls = {}
-        with self.my_lock('query'):
+        with self.db_lock('query'):
             num_records = len(self.my_db)
             for name, item in self.my_db.items():
                 name_list = name.split(';')
