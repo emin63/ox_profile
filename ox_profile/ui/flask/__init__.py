@@ -6,7 +6,10 @@ flask application, you should call register_blueprint(OX_PROF_BP)
 appropriately.
 """
 
+import threading
 import logging
+import copy
+
 
 from flask import Blueprint
 
@@ -20,7 +23,39 @@ class OxProfBlueprint(Blueprint):
 
     def __init__(self, *args, **kwargs):
         Blueprint.__init__(self, *args, **kwargs)
+        self.req_db = {}
+        self.db_lock = threading.Lock()
         self.launcher = launchers.SimpleLauncher()
+
+    def record_req(self, username, endpoint, stime, etime):
+        """Record request information.
+
+        :param username:        String username initiating request.
+
+        :param endpoint:        String name of endpoint.
+
+        :param stime:    A datetime.datetime in UTC for start time.
+
+        :param etime:    A datetime.datetime in UTC for end time.
+
+        ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+        PURPOSE:  Record data about a completed request. Expected to
+                  be called by something in teardown_app_request.
+
+        """
+        with self.db_lock:
+            key = (username, endpoint)
+            record = self.req_db.get(key, [])
+            if not record:
+                self.req_db[key] = record
+            record.append((stime, etime))
+
+    def get_reqs(self):
+        """Return a copy of self.req_db.
+        """
+        with self.db_lock:
+            return copy.deepcopy(self.req_db)
 
     def register(self, app, *args, **kwargs):
         """Override default register method to also activate plugins.
