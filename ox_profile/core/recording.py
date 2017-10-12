@@ -3,36 +3,6 @@
 
 import re
 import threading
-import logging
-
-
-class LoggingLock(object):
-
-    def __init__(self, name, log_func=None):
-        self.name = name
-        self.lock = threading.Lock()
-        self.log_func = log_func if log_func else logging.debug
-
-    def acquire(self, msg=''):
-        self.log_func('Acquire lock %s; %s', self.name, msg)
-        self.lock.acquire()
-
-    def release(self, msg=''):
-        self.log_func('Release lock %s; %s', self.name, msg)
-        self.lock.release()
-
-    def __call__(self, msg):
-        self.log_func('For lock %s: %s', self.name, msg)
-        return self
-
-    def __enter__(self):
-        self.acquire()
-        return self
-
-    def __exit__(self, mytype, value, traceback):
-        dummy_ignore = mytype, value, traceback
-        self.release()
-        return self
 
 
 class ProfileRecord(object):
@@ -55,8 +25,8 @@ class CountingRecorder(object):
     """
 
     def __init__(self):
-        self.db_lock = LoggingLock('CountingRecorder')
-        with self.db_lock('initializing'):
+        self.db_lock = threading.Lock()
+        with self.db_lock:
             self.my_db = {}
 
     def record(self, measurement):
@@ -71,7 +41,7 @@ class CountingRecorder(object):
                   recorders may track different things about a measurement.
 
         """
-        with self.db_lock('record'):
+        with self.db_lock:
             record = self.my_db.get(measurement.name, 0)
             self.my_db[measurement.name] = record + 1
 
@@ -102,7 +72,7 @@ class CountingRecorder(object):
         # *IMPORTANT: be careful in code below to not do anything to
         # call self.record or anything else which would try to acquire
         # self.db_lock otherwise you will deadlock
-        with self.db_lock('query'):
+        with self.db_lock:
             num_records = len(self.my_db)
             # Use explicit list in case dict changes during iteration
             for name, item in list(self.my_db.items()):
