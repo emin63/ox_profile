@@ -34,12 +34,22 @@ class Sampler(object):
     def run(self):
         """Run the sampler to make a measurement of the current stack frames.
         """
-        frames_dict = sys._current_frames()  # pylint: disable=protected-access
         measure_tool = self.get_measure_tool()
-        for frame_id, frame in frames_dict.items():
-            logging.debug('Recording frame with id %s', str(frame_id))
-            measure = measure_tool(frame)
-            self.my_db.record(measure)
+
+        # Muck with switch interval to prevent thread context switching while
+        # trying to capture profiling information for safety
+
+        switch_interval = sys.getswitchinterval()
+        try:
+            logging.debug('Process sampling')
+            sys.setswitchinterval(10000)
+            for dummy_frame_id, frame in (
+                    sys._current_frames(  # pylint: disable=protected-access
+                        ).items()):
+                self.my_db.record(measure_tool(frame))
+        finally:
+            sys.setswitchinterval(switch_interval)
+        logging.debug('Switch interval now %.2f', sys.getswitchinterval())
 
     def __call__(self, *args, **kwargs):
         "Syntactic sugar to call `self.run(*args, **kwargs)`."
