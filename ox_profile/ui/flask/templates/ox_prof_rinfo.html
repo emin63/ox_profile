@@ -1,0 +1,24 @@
+{% extends "ox_prof_layout.html" %}
+{% block body %}
+
+<div>
+  <h2>Ox Profile Route Info</h2>
+</div>
+<hr>
+<div>
+  {{ csv_link }}
+  <TABLE>
+    <TH>Route</TH>
+    <TH>Hits</TH>
+    <TH>Avg Time</TH>
+    {% for item in rinfo %}    
+    <TR>
+      <TD>{{ item.name }}</TD>
+      <TD>{{ item.hits }}</TD>
+      <TD>{{ '%.3f' % item.avg_time }}</TD>
+    </TR>
+    {% endfor %}
+  </TABLE>
+</div>
+
+{% endblock %}
