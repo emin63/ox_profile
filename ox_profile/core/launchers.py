@@ -106,7 +106,8 @@ class SimpleLauncher(threading.Thread):
         logging.info('Starting Launcher')
         prev = time.time()
         while not self.stop_flag.is_set():
-            time.sleep(self.interval)
+            interval = self.interval
+            time.sleep(interval)
             self.tracker.snap(prev)
             self.unpaused.wait()
             prev = time.time()
