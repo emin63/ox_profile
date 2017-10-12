@@ -6,6 +6,7 @@ flask application, you should call register_blueprint(OX_PROF_BP)
 appropriately.
 """
 
+import collections
 import threading
 import logging
 import copy
@@ -15,6 +16,8 @@ from flask import Blueprint
 
 from ox_profile.core import launchers
 
+
+ReqRecord = collections.namedtuple('ReqRecord', ['start_time', 'end_time'])
 
 class OxProfBlueprint(Blueprint):
     """Subclass flask Blueprint to provide custom blueprint for ox_profile.
@@ -49,7 +52,7 @@ class OxProfBlueprint(Blueprint):
             record = self.req_db.get(key, [])
             if not record:
                 self.req_db[key] = record
-            record.append((stime, etime))
+            record.append(ReqRecord(stime, etime))
 
     def get_reqs(self):
         """Return a copy of self.req_db.
