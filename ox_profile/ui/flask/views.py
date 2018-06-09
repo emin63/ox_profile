@@ -11,8 +11,8 @@ from functools import wraps
 
 from flask import (
     request, Markup, current_app, render_template, url_for, g, make_response)
-from flask.ext.login import login_required
-from flask.ext.login import current_user
+from flask_login import login_required
+from flask_login import current_user
 
 from ox_profile.ui.flask import OX_PROF_BP, ReqRecord
 
