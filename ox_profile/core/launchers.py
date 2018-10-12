@@ -1,6 +1,7 @@
 """Module containing profiling launchers.
 """
 
+import doctest
 import time
 import logging
 import threading
@@ -10,6 +11,16 @@ from ox_profile.core import sampling, recording
 
 
 class SamplingTracker:
+    """Simple class to track how often we sample things.
+
+    This class is meant to track how often we take samples. Since we are
+    doing stastitical profiling, the interval between samples is random
+    and can be affected by many things. The SamplingTracker is used
+    to follow that.
+
+    Usually you do not need to worry much about this and can just use
+    the SimpleLauncher which has an instance of a SamplingTracker.
+    """
 
     def __init__(self):
         self.calls = 0
@@ -17,17 +28,24 @@ class SamplingTracker:
         self.wait_sq = 0.0
 
     def reset(self):
+        "Reset everything in the tracker."
         self.calls = 0
         self.wait = 0.0
         self.wait_sq = 0.0
 
     def snap(self, prev):
+        """Snap a sample remember how far it was since the previous snap.
+
+        The `prev` argument represents the `time.time()` of the previous
+        snap. We then save the `time.time()` from now to prev.
+        """
         my_wait = time.time() - prev
         self.calls += 1
         self.wait += my_wait
         self.wait_sq += my_wait**2
 
     def stats(self):
+        "Return dictionary of stats related to snap interval."
         if self.calls == 0:
             return 'No samples taken'
 
@@ -35,8 +53,44 @@ class SamplingTracker:
         return {'mean': mean,
                 'stdev': (self.wait_sq/self.calls - mean**2)**0.5}
 
+
 class SimpleLauncher(threading.Thread):
     """Simple profiling launcher.
+
+The `SimpleLauncher` is top-level class to do statistical
+profiling. While some features are configurable, the simplest thing to
+do is just instantiate an instance of this class and call its
+`unpause` method to start profiling.
+
+Basically, what this class does is:
+
+  1. Creates an instance of the `Sampler` class with reasonable defaults.
+  2. Initializes itself as a daemon thread and starts.
+  3. Pauses itself so the thread does nothing so as to not load the system.
+  4. Provides an `unpause` method you can use when you want to turn on
+     profiling.
+  5. Provides a `pause` method if you want to turn off profiling.
+
+
+Example usage is shown below:
+
+>>> import random, math, time
+>>> from ox_profile.core import launchers
+>>> launcher = launchers.SimpleLauncher()
+>>> def example_func(x):
+...     return [math.atanh(random.uniform(0,1)) for i in range(x)]
+...
+>>> launcher.start()
+>>> launcher.unpause()
+>>> dummy = [example_func(i) for i in range(2000)]
+>>> query, total_records = launcher.sampler.my_db.query()
+>>> info = ['%s: %s' % (i.name, i.hits) for i in query]
+>>> print('Items:%s' % (('%c - ' % 10).join([''] + info)))# doctest: +ELLIPSIS
+Items:
+ - ...
+ - ...
+>>> launcher.cancel()  # This turns off the profiler for good
+
     """
 
     def __init__(self, sampler=None, stop_flag=None, interval=.001,
@@ -74,6 +128,11 @@ class SimpleLauncher(threading.Thread):
         assert self.isDaemon()
 
     def set_interval(self, new_interval):
+        """Set the interval for how often we take a sample.
+
+        :arg new_interval:  Float between 0 and 10 for how long to
+                            wait beteeen samples.
+        """
         assert new_interval > 0 and new_interval < 10
         self.interval = new_interval
         self.tracker.reset()
@@ -123,3 +182,9 @@ class SimpleLauncher(threading.Thread):
         unpaused) for the thread to actually exit.
         """
         self.stop_flag.set()
+
+
+if __name__ == '__main__':
+    # Run doctest if file executed as a script
+    doctest.testmod()
+    print('Finished Tests')
