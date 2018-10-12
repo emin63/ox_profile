@@ -7,6 +7,9 @@ class Measurement(object):
 
     The idea is that you initialize an instance of a Measurement when
     you want to get some profiling information about a program.
+
+    One important thing the Measurement instance must do is take
+    a stack frame and map it to a unique name using the `snap` method.
     """
 
     def __init__(self, frame):
@@ -35,7 +38,9 @@ class Measurement(object):
         ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
         PURPOSE:   Meant to be called internally by __init__ to snap a
-                   measurement.
+                   measurement. We want each call path to have a different
+                   string representation. To do that we just use the
+                   backtrace as the name.
 
         """
         stack = []
