@@ -6,7 +6,7 @@ flask blueprint so that you can start/stop/analyze profiling from
 within your application. You can also run the profiler stand-alone
 without `Flask` as well.
 
-# Why statistical profiling?
+# Why statistical profiling (and why ox_profile)?
 
 Python contains many profilers which instrument your code and give you
 exact results. A main benefit here is you know *exactly* what your
@@ -18,6 +18,26 @@ doing with an overhead that can be tuned as desired.
 One main use case for `ox_profile` specifically (and statistical
 profiling in general) is that you can apply it to a production server
 to see how things work "in the wild".
+
+There are other statistical profilers out there for python (such as
+statprof, which are pretty good and may be better for your needs than
+`ox_profile`. So why would you consider `ox_profile`? Some possible
+reasons include:
+
+  1. Works on non-UNIX systems (e.g., works on Windows).
+     - Many other statistical profilers use various excellent features
+       of LINUX or UNIX while `ox_profile` only really relies on the
+       python `sys._current_frames` method.
+  2. Simple to understand.
+	 - The code for `ox_profile` is fairly simple. The main work is
+       really inside `ox_profile.core.sampling.Sampler` so it is easy
+       to reason about or modify if you need slightly different
+       profiling.
+  3. Flask Blueprint provided.
+     - If you are using Flask, then you can register the `ox_profile`
+       blueprint and easily get statistical profiling in your flask
+       app.
+
 
 # Usage
 
