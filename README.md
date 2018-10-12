@@ -68,6 +68,69 @@ bare bones. When you look at the results of
 raw list of each function your program has called along with how many
 times that function was called in our sampling.
 
+# Design
+
+## High Level Design
+
+Python offers a number of ways to get profiling information. In
+addition to high-level profiling tools such as in the `profile`
+package, there are specialized functions like `sys.settrace` and
+`sys.setprofile`. These are used for deterministic profiling and
+relatively robust but have some overhead as they are invoked on each
+function call.
+
+At a high level, we want a way to get a sample of what the python
+interpreter is doing at any give instance. The sampling approach has
+the advantage that by turning the sampling interval low enough, we can
+add arbitrarily low overhead and make profiling feasible in a
+production system. By taking a long enough sample, however, we should
+be able to get arbitrarily accurate profiling information.
+
+## Low Level Design
+
+At a low level, we do this sampling using `sys._current_frames`. As
+suggested by the leading underscore, this system function may be a bit
+less robust. Indeed, the documentation says "This function should be
+used for specialized purposes only." Hopefully the core python
+developers will not make major changes to such a useful function.
+
+In any case, the most interestig class is the `Sampler` class in the
+`ox_profile.core.sampling` module. This class has a run method which
+does the following:
+
+  1. Uses `sys.setswitchinterval` to try and prevent a thread context switch.
+  2. Calls `sys._current_frames` to sample what the python interpreter is doing.
+  3. Updates a simple in-memory database of what functions are running.
+
+In principle, you could just use the Sampler via something like
+```
+    >>> from ox_profile.core import sampling, recording
+    >>> sampler = sampling.Sampler(recording.CountingRecorder())
+    >>> def foo():
+    ...     sampler.run()
+    ...     return 'done'
+    ... 
+    >>> foo()
+```
+
+The above would have the sampler take a snapshot of the stack frames when the `foo` function is run. Of course, this isn't very useful by itself because it just tells you that `foo` is being run. It could be useful if there were other threads which were running because the sampler would tell you what stack frame those threads were in.
+
+In princple, you could just call the `Sampler.run` method to track
+other threads but that still isn't very convenient. To make things
+easy to use, we provide the `SimpleLauncher` class in the
+`ox_profile.core.launchers` module as shown in the Usage section. The
+`SimpleLauncher` basically does the following:
+
+  1. Creates an instance of the `Sampler` class with reasonable defaults.
+  2. Initializes itself as a daemon thread and starts.
+  3. Pauses itself so the thread does nothing so as to not load the system.
+  4. Provides an `unpause` method you can use when you want to turn on profiling.
+  5. Provides a `pause` method if you want to turn off profiling.
+  
+In principle, you don't need much beyond the `Sampler` but the
+`SimpleLauncher` makes it easier to launch a `Sampler` in a separate
+thread.
+
 # Known Issues
 
 ## Granularity
