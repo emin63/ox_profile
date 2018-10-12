@@ -19,6 +19,7 @@ from ox_profile.core import launchers
 
 ReqRecord = collections.namedtuple('ReqRecord', ['start_time', 'end_time'])
 
+
 class OxProfBlueprint(Blueprint):
     """Subclass flask Blueprint to provide custom blueprint for ox_profile.
 
