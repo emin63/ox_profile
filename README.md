@@ -54,9 +54,9 @@ and then running queries when convenient via something like:
     >>> launcher.unpause()
     >>> <call some functions>
     >>> query, total_records = launcher.sampler.my_db.query()
-	>>> info = ['%s: %s' % (i.name, i.hits) for i in query]
-	>>> print('Items in query:\n  - %s' % (('\n  - '.join(info))))
-	>>> launcher.cancel()  # This turns off the profiler for good
+    >>> info = ['%s: %s' % (i.name, i.hits) for i in query]
+    >>> print('Items in query:\n  - %s' % (('\n  - '.join(info))))
+    >>> launcher.cancel()  # This turns off the profiler for good
 ```
 
 # Output
