@@ -19,6 +19,16 @@ class ProfileRecord(object):
         self.name = name
         self.hits = hits
 
+    def to_str(self):
+        "Return string reprsentation."
+        result = '%s(%s=%s, %s=%s)' % (
+            self.__class__.__name__, 'name', self.name, 'hits', self.hits)
+
+        return result
+
+    def __repr__(self):
+        return self.to_str()
+
 
 class CountingRecorder(object):
     """Recorder which just counts how many times something is called.
