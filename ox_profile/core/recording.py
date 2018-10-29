@@ -96,7 +96,7 @@ class CountingRecorder(object):
                 :max_records]]
             return result, num_records
 
-    def show(self, limit=10, query=None, sep='-', bar='|'):
+    def show(self, limit=10, query=None, sep='-', col='|'):
         """Show query as pretty formatted string.
 
         :arg limit=10:     Maximum lines to show.
@@ -108,7 +108,7 @@ class CountingRecorder(object):
         :arg sep='-':      Optional horizontal line separator. Use '' if
                            you do not want a separator.
 
-        :arg bar='|':      Optional vertical line separator. Use '' if
+        :arg col='|':      Optional vertical line separator. Use '' if
                            you do not want a separator.
 
         ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
@@ -121,7 +121,7 @@ class CountingRecorder(object):
 
         """
         if query is None:
-            query, num_records = self.query()
+            query, num_records = self.query(max_records=100)
         else:
             num_records = len(query)
         total_hits = float(sum([item.hits for item in query]))
@@ -132,7 +132,7 @@ class CountingRecorder(object):
         else:
             note = ''
         width = 40
-        fmt = '%s {:%i} %s {:^8} %s {:5} %s' % (bar, width, bar, bar, bar)
+        fmt = '%s {:%i} %s {:^8} %s {:5} %s' % (col, width, col, col, col)
         header = fmt.format('Function', 'Hits', '%')
         if sep:
             line_sep = '\n  ' + (sep * len(header)) + '\n  '
