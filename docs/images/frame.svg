@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="48cm" height="24cm" viewBox="178 61 941 472" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="483.5" y="228.5">
+    <tspan x="483.5" y="228.5"></tspan>
+  </text>
+  <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="483.5" y="228.5">
+    <tspan x="483.5" y="228.5"></tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="180" y="62" width="502" height="177"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="62" width="502" height="177"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="431" y="155.3">
+      <tspan x="431" y="155.3"></tspan>
+    </text>
+  </g>
+  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="188.5" y="81.5">
+    <tspan x="188.5" y="81.5">Stack Frame: object for running code</tspan>
+    <tspan x="188.5" y="109.722"></tspan>
+    <tspan x="188.5" y="137.944">  f_back (caller's stack frame)</tspan>
+    <tspan x="188.5" y="166.167">  f_code (code for this frame)</tspan>
+    <tspan x="188.5" y="194.389">  f_globals (globals seen here)</tspan>
+    <tspan x="188.5" y="222.611">  ... (see docs for inspect)</tspan>
+  </text>
+  <g>
+    <path style="fill: #ffffff" d="M 689.667 280 L 1032.33,280 C 1079.65,280 1118,336.412 1118,406 C 1118,475.588 1079.65,532 1032.33,532 L 689.667,532 C 642.354,532 604,475.588 604,406 C 604,336.412 642.354,280 689.667,280z"/>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 689.667 280 L 1032.33,280 C 1079.65,280 1118,336.412 1118,406 C 1118,475.588 1079.65,532 1032.33,532 L 689.667,532 C 642.354,532 604,475.588 604,406 C 604,336.412 642.354,280 689.667,280"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="411">
+      <tspan x="861" y="411"></tspan>
+    </text>
+  </g>
+  <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="638.9" y="334.8">
+    <tspan x="638.9" y="334.8">Code Object:</tspan>
+    <tspan x="638.9" y="363.022"></tspan>
+    <tspan x="638.9" y="391.244">  co_name (Name of the code block)</tspan>
+    <tspan x="638.9" y="419.467">  co_filename (File where created)</tspan>
+    <tspan x="638.9" y="447.689">  co_firstlineno (Number of first</tspan>
+    <tspan x="638.9" y="475.911">                  line in source)</tspan>
+    <tspan x="638.9" y="504.133">  ... (see docs for inspect)</tspan>
+  </text>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 853.968,273.269 A 432.955,432.955 0 0 0 595,158"/>
+    <polygon style="fill: #000000" points="859.402,278.436 848.759,275.013 854.043,273.189 855.754,267.867 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="859.402,278.436 848.759,275.013 854.043,273.189 855.754,267.867 "/>
+  </g>
+  <text font-size="33.8662" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="191" y="326">
+    <tspan x="191" y="326">Can extract profiling</tspan>
+    <tspan x="191" y="368.333">information to get function</tspan>
+    <tspan x="191" y="410.667">name from co_name,</tspan>
+    <tspan x="191" y="453">caller from f_back, etc.</tspan>
+  </text>
+</svg>

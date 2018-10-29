@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      <!-- below os for proper PDF export -->
+      @page {
+      size: 1210px 681px;
+      margin: 0;
+      }
+
+      @media print {
+      .remark-slide-scaler {
+      width: 100% !important;
+      height: 100% !important;
+      transform: scale(1) !important;
+      top: 0 !important;
+      left: 0 !important;
+      }
+      }  
+
+      /* Two-column layout */
+      .left-column {
+        width: 20%;
+        height: 92%;
+        float: left;
+      }
+      .right-column {
+        width: 75%;
+        float: right;
+        padding-top: 1em;
+      }
+
+      .hleft-column {
+        width: 45%;
+        height: 92%;
+        float: left;
+      }
+      .hright-column {
+        width: 45%;
+        float: right;
+        padding-top: 1em;
+      }            
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: center, middle
+
+# Ox Profile
+
+  Statistical profiling in python with the `ox_profile` package and others.
+
+
+---
+# Outline
+
+  1. Describe profiling and why statistical profiling.
+ 
+  2. Discuss various approaches and neat python internal tools.
+
+  3. Describe `ox_profile` implementation.
+
+#### Goal: you can use `ox_profile` or other profilers or write your own!
+
+
+???
+
+Presenter notes go here.
+
+---
+
+# What is profiling?
+
+From python.org:
+  - "A profile is a set of statistics that describes how often and for how
+     long various parts of the program executed."
+
+Profiling is useful to find out which parts of program are slow.
+
+---
+
+
+# How do we profile?
+
+Many tools exist:
+
+#### Standard library:
+
+  - `cProfile`, `profile`: deterministic profilers
+
+#### Third Party:
+
+  - `stat_prof`, `plop`: timer based statistical profilers (POSIX only)
+
+  - `pyflame`: based on `ptrace` system call (POSIX only)
+
+  - `pprofile`, `ox_profile` thread based statistical profilers
+
+  - lots of others
+
+
+---
+
+# Deterministic Profiling
+
+```
+>>> import cProfile, re
+>>> cProfile.run('re.compile("foo|bar")')
+```
+
+gives:
+
+```xml
+      197 function calls (192 primitive calls) in 0.002 seconds
+
+Ordered by: standard name
+
+ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     1    0.000    0.000    0.001    0.001 <string>:1(<module>)
+     1    0.000    0.000    0.001    0.001 re.py:212(compile)
+     1    0.000    0.000    0.001    0.001 re.py:268(_compile)
+     1    0.000    0.000    0.000    0.000 sre_compile.py:172(_compile_charset)
+     1    0.000    0.000    0.000    0.000 sre_compile.py:201(_optimize_charset)
+     4    0.000    0.000    0.000    0.000 sre_compile.py:25(_identityfunction)
+   3/1    0.000    0.000    0.000    0.000 sre_compile.py:33(_compile)
+```
+
+---
+
+# Deterministic profiling hooks
+
+The `sys` module provides:
+
+ - `settrace`: Set a function to execute on each call, line, etc.
+ - `setprofile`: Set a function to execute on each call.
+
+Used as a hook to inspect stack frame.
+
+---
+
+# Python Stack Frame
+
+<!--
+<pre style="background: lightyellow;  padding-top: 0px;
+        padding: 1px 20px;
+        height: 90px;
+        width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
+        box-shadow: 0 0 10px #777;">
+FIXME
+</pre>
+-->
+
+<img src="images/frame.svg" style="width: 100%">
+
+---
+
+# Drawbacks to deterministic profiling
+
+
+  1. **SLOW**: hooks run on each line or each function!
+--
+
+
+  2. See #1: usually can't profile production code.
+--
+
+  3. Not thread-aware:
+>"it must be registered using `settrace()` for each thread being debugged" (similar for `setprofile()`).
+
+Statistical profilers address these issues.
+
+---
+
+# Profiling approaches
+
+Need to periodically look at call stack + record it.
+
+
+  1. POSIX `timer`: low level timer that can interrupt your process.
+     - `stat_prof`, `plop` (not available on Windows).
+
+  2. Threads via `ptrace`: lets one program control/inspect another.
+     - `pyflame`, (not available on Windows).
+
+  3. `sys._current_frames()` lists each thread's current frame.
+     - `ox_profile`, `pprofile`, (works on windows!)  
+     - Very useful function described later; beware leading `_`
+
+
+---
+
+# Why do we care about non-POSIX?
+
+--
+  1. Nice to have "portable" implementation.
+
+--
+
+  2. Using only python features may be easier to understand/modify.
+     - Understandable implementation essential if run in production.
+
+--
+
+  3. Consumer software (e.g., games) often run in Windows.
+
+--
+
+  4. Can't we all just get along?
+
+
+---
+	  
+# Logistics: How do we profile?
+
+Install via the usual
+```bash
+$ pip install ox_profile
+```
+
+Then start your python interpreter and:
+
+```python
+>>> from ox_profile.core.launchers import SimpleLauncher
+>>> profiler = SimpleLauncher.launch()      # Create and start a profiler.
+>>> # call some functions
+>>> print(profiler.show())                  # Show results
+>>> profiler.cancel()                       # Turns off the profiler for good.
+```
+
+???
+
+  - Goal of this slide is to illustrate where we are going.
+  - Want audience to have simple usage in mind as we dig in to details
+
+
+---
+
+# Profiler output
+
+Output shows:
+
+  - Function name (and module).
+  - How many times function was seen while sampling (and %)
+
+
+```output
+   Function                                    Hits    %
+  ---------------------------------------------------------
+   send(requests.sessions)                    10082    2.8   
+   request(requests.api)                       7710    2.1   
+   get(requests.api)                           7710    2.1   
+  <listcomp>(__main__)                         7710    2.1  
+  __call__(ox_profile.core.sampling)           7710    2.1  
+  request(requests.sessions)                   7698    2.1  
+  send(requests.adapters)                      6897    1.9  
+  _make_request(urllib3.connectionpool)        6893    1.9  
+  urlopen(urllib3.connectionpool)              6893    1.9  
+  connect(urllib3.connection)                  5602    1.5  
+```
+
+  - Some of these show sampler overhead in if program not CPU-bound
+  - Set sampling to 1/second or 1/10-seconds to reduce overhead more
+    - You can test to verify for your app (or profile to improve)
+
+---
+
+# Using Flask
+
+If you are running a flask web server, do:
+
+```python
+    from ox_profile.ui.flask.views import OX_PROF_BP
+    app.register_blueprint(OX_PROF_BP)
+	app.config['OX_PROF_USERS'] = {<admin_user_1>, <admin_user_2>, ...}
+```
+
+to get an easy way for profiling production code:
+
+  - `ox_profile/unpause`: Start (or unpause) profiler.
+  
+  - `ox_profile/pause`: Pause profiler to reduce (already small) overhead.
+  
+  - `ox_profile/status`: Shows current profiling status.
+
+
+---
+
+# Basic theory of using sys._current_frames
+
+  1. Start thread which does `time.sleep` most of the time.
+
+  2. Occassionally wakes and calls `sys._current_frames()`
+
+  3. Record information about current stack frame(s).
+
+In theory, you can write simple statistical profiler with just these.
+
+--
+
+In theory, there is no difference between theory and practice. 
+
+--
+  - But, in practice, there is.
+
+---
+
+# Issues: (thread switching)
+
+In theory, just step through `sys._current_frames()` and record data.
+
+```python
+        sys.setswitchinterval(10000)
+        for dummy_frame_id, frame in (sys._current_frames().items()):
+            self.my_db.record(measure_tool(frame))
+```
+
+What could go wrong?
+
+--
+  - thread context could switch = attempt to read stale frame = **CRASH!**
+
+---
+
+# Issues: (thread switching)
+
+In theory, just step through `sys._current_frames()` and record data.
+
+```python
+        switch_interval = sys.getswitchinterval()
+	
+        sys.setswitchinterval(10000)
+        for dummy_frame_id, frame in (sys._current_frames().items()):
+            self.my_db.record(measure_tool(frame))
+	    
+        sys.setswitchinterval(switch_interval)
+```
+
+Need to use `sys.setswitchinterval` to prevent context switch.
+
+Now, what could go wrong?
+
+--
+  - Exception prevents switch interval from being reset!
+
+---
+
+# Issues: (thread switching)
+
+In theory, just step through `sys._current_frames()` and record data.
+
+```python
+        switch_interval = sys.getswitchinterval()
+        try:
+            sys.setswitchinterval(10000)
+            for dummy_frame_id, frame in (
+                    sys._current_frames().items()):
+                self.my_db.record(measure_tool(frame))
+        finally:
+            sys.setswitchinterval(switch_interval)
+```
+
+Need to use `sys.setswitchinterval` to prevent context switch.
+
+Need `try/finally` to protect thread logic.
+
+Now, what could go wrong?
+
+--
+  - We are just getting started.
+
+
+---
+
+# Issues: (thread locking)
+
+Use simple function to record a sample in a dictionary:
+
+```python
+
+    def record(self, measurement):  # maintain dictionary of measurements
+        record = self.my_db.get(measurement.name, 0)  # find+increment hits
+        self.my_db[measurement.name] = record + 1     # for given function
+```
+
+What could go wrong?
+
+--
+   - Imagine you try to iterate over `self.my_db` to view profile results.
+   - If `record` is being called, you change dict during iteration = **CRASH**!
+
+---
+
+# Issues: (thread locking)
+
+```python
+
+    def __init__(self):
+        self.db_lock = threading.Lock()
+
+    def record(self, measurement):
+        with self.db_lock:
+            record = self.my_db.get(measurement.name, 0)
+            self.my_db[measurement.name] = record + 1
+```
+
+Need to using `threading.Lock` to prevent simultaneous access to `my_db`.
+
+What could go wrong?
+
+--
+   - Unknown unknowns: use `faulthandler.enable()` at start of your program.
+
+---
+
+# Additional Issues
+
+
+   - When you try to exit program, sampler thread still alive.
+     - We make sure to set `self.daemon = True` when creating sampler.
+
+   - Minimum sleep time on the order of 1--10 milliseconds
+     - Applies to time.sleep or wait on a thread event.
+     
+     - Cannot get granularity finer than about 1 millisecond.
+     
+       - Probably OK, but even paranoids have enemies.
+
+---
+
+# Concluding Remarks
+
+  1. Profiling helps find bottlenecks + improve your code.
+
+  2. Statistical profiler samples code to analyze production with low overhead.
+
+  3. You can use `ox_profile` or write your own profiler.
+
+  4. Key tools are `sys.setprofile`, `sys.settrace`, `sys._current_frames`.
+
+  5. Profiling simple in theory but be careful when using threads.
+     - need `try/finally`, thread locks, protect switch interval, etc.
+
+  <!-- Things below are to make remark JS work -->
+  <!-- See https://github.com/gnab/remark/blob/gh-pages/index.html 
+       for example presentation and tricks for remark stuff -->  
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
