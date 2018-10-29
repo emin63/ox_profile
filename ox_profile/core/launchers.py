@@ -127,11 +127,14 @@ Items:
         self.daemon = True
         assert self.isDaemon()
 
-    def launch(self):
-        """Syntatic sugar for calling start() then unpause().
+    @classmethod
+    def launch(cls):
+        """Syntatic sugar for calling s=cls(), s.start() then s.unpause().
         """
-        self.start()
-        self.unpause()
+        result = cls()
+        result.start()
+        result.unpause()
+        return result
 
     def show(self, *args, **kwargs):
         """Syntatic sugar for calling self.sampler.show(*args, **kwargs).
