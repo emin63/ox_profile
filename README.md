@@ -71,7 +71,7 @@ status as shown below:
     >>> profiler.start()                         # The profiler is a thread so we need to call start
     >>> profiler.unpause()                       # The profiler starts out paused so we unpause it
     >>> # call functions or start main program
-	>>> profiler.pause()                         # You can pause if done profiling or leave running
+    >>> profiler.pause()                         # You can pause if done profiling or leave running
     >>> query, total_records = profiler.query()  # Query for what the profiler has found
     >>> info = ['%s: %s' % (i.name, i.hits) for i in query]
     >>> print('Items in query:\n  - %s' % (('\n  - '.join(info))))
