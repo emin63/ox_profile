@@ -56,7 +56,7 @@ something like:
 ```
     >>> from ox_profile.core.launchers import SimpleLauncher
     >>> profiler = SimpleLauncher.launch()      # Create and start a profiler.
-    >>> <call some functions>
+    >>> # call some functions
     >>> print(profiler.show())                  # Print current results in preformmated way.
     >>> profiler.cancel()                       # Turns off the profiler for good.
 ```
@@ -70,7 +70,7 @@ status as shown below:
     >>> profiler = launchers.SimpleLauncher()    # Create an instance of launcher to be your profiler
     >>> profiler.start()                         # The profiler is a thread so we need to call start
     >>> profiler.unpause()                       # The profiler starts out paused so we unpause it
-    >>> <call functions or start main program>
+    >>> # call functions or start main program
 	>>> profiler.pause()                         # You can pause if done profiling or leave running
     >>> query, total_records = profiler.query()  # Query for what the profiler has found
     >>> info = ['%s: %s' % (i.name, i.hits) for i in query]
