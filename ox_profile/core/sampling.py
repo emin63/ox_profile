@@ -54,6 +54,20 @@ of this class.
     def __init__(self, my_db):
         self.my_db = my_db
 
+    def show(self, *args, **kwargs):
+        """Syntatic sugar self.my_db.show(*args, **kwargs) to show results.
+
+        Returns a string describing collected data.
+        """
+        return self.my_db.show(*args, **kwargs)
+
+    def query(self, *args, **kwargs):
+        """Syntatic sugar self.my_db.query(*args, **kwargs) to query results.
+
+        Returns a string describing collected data.
+        """
+        return self.my_db.query(*args, **kwargs)
+
     def get_measure_tool(self):
         """Get a class or function to call to take a measurement.
 

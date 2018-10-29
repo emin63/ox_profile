@@ -41,6 +41,43 @@ reasons include:
 
 # Usage
 
+## Stand alone
+
+You can install `ox_profile` using pip via something like
+
+```sh
+    $ pip install ox_profile
+```
+
+The simplest way to run the profiler is by starting the launcher,
+calling some functions, and the printing the profiled data via
+something like:
+
+```
+    >>> from ox_profile.core.launchers import SimpleLauncher
+    >>> profiler = SimpleLauncher.launch()      # Create and start a profiler.
+    >>> <call some functions>
+    >>> print(profiler.show())                  # Print current results in preformmated way.
+    >>> profiler.cancel()                       # Turns off the profiler for good.
+```
+
+Often you may want a slightly more sophisticated use case where you
+can pause and unpause the profiler and get more details about its
+status as shown below:
+
+```
+    >>> from ox_profile.core import launchers
+    >>> profiler = launchers.SimpleLauncher()    # Create an instance of launcher to be your profiler
+    >>> profiler.start()                         # The profiler is a thread so we need to call start
+    >>> profiler.unpause()                       # The profiler starts out paused so we unpause it
+    >>> <call functions or start main program>
+	>>> profiler.pause()                         # You can pause if done profiling or leave running
+    >>> query, total_records = profiler.query()  # Query for what the profiler has found
+    >>> info = ['%s: %s' % (i.name, i.hits) for i in query]
+    >>> print('Items in query:\n  - %s' % (('\n  - '.join(info))))
+    >>> profiler.cancel()                        # This turns off the profiler for good
+```
+
 ## With Flask
 
 If you are using the python flask framework and have installed
@@ -62,28 +99,11 @@ so that it will not incur any overhead for your app. Go to
 the `/ox_profile/unpause` route to unpause and begin profiling so
 that `/ox_profile/status` shows something interesting.
 
-## Stand alone
-
-You can run the profiler without flask simply by starting the launcher
-and then running queries when convenient via something like:
-
-```
-    >>> from ox_profile.core import launchers
-    >>> launcher = launchers.SimpleLauncher()
-    >>> launcher.start()
-    >>> launcher.unpause()
-    >>> <call some functions>
-    >>> query, total_records = launcher.sampler.my_db.query()
-    >>> info = ['%s: %s' % (i.name, i.hits) for i in query]
-    >>> print('Items in query:\n  - %s' % (('\n  - '.join(info))))
-    >>> launcher.cancel()  # This turns off the profiler for good
-```
-
 # Output
 
 Currently `ox_profile` is in alpha mode and so the output is fairly
-bare bones. When you look at the results of
-`launcher.sampler.my_db.query()` in stand alone mode or at the
+bare bones. When you look at the results of calling the `query` method
+of an instance of `SimpleLauncher` in stand alone mode or at the
 `/ox_profile/status` route when running with flask, what you get is a
 raw list of each function your program has called along with how many
 times that function was called in our sampling.

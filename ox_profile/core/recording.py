@@ -95,3 +95,52 @@ class CountingRecorder(object):
             result = [ProfileRecord(name, hits) for name, hits in my_hits[
                 :max_records]]
             return result, num_records
+
+    def show(self, limit=10, query=None, sep='-', bar='|'):
+        """Show query as pretty formatted string.
+
+        :arg limit=10:     Maximum lines to show.
+
+        :arg query=None:   Optional output of calling self.query()[0]. If
+                           query is None, we call self.query(max_records=100)
+                           to get the query.
+
+        :arg sep='-':      Optional horizontal line separator. Use '' if
+                           you do not want a separator.
+
+        :arg bar='|':      Optional vertical line separator. Use '' if
+                           you do not want a separator.
+
+        ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+        :returns:  A string with profiling results formatted nicely.
+
+        ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
+
+        PURPOSE:   Show the profiling results.
+
+        """
+        if query is None:
+            query, num_records = self.query()
+        else:
+            num_records = len(query)
+        total_hits = float(sum([item.hits for item in query]))
+        if limit:
+            note = '' if limit is None else (' (top %i/%i results)' % (
+                min(limit, num_records), num_records))
+            query = query[:limit]
+        else:
+            note = ''
+        width = 40
+        fmt = '%s {:%i} %s {:^8} %s {:5} %s' % (bar, width, bar, bar, bar)
+        header = fmt.format('Function', 'Hits', '%')
+        if sep:
+            line_sep = '\n  ' + (sep * len(header)) + '\n  '
+        else:
+            line_sep = '\n'
+        text = ('Profiling results:%s\n%s' % (note, line_sep)) + (
+            header + line_sep) + (line_sep).join([fmt.format(
+                i.name[:width], i.hits, '%.1f' % (100*(i.hits/total_hits)))
+                                                  for i in query]) + line_sep
+
+        return text

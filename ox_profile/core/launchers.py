@@ -127,6 +127,26 @@ Items:
         self.daemon = True
         assert self.isDaemon()
 
+    def launch(self):
+        """Syntatic sugar for calling start() then unpause().
+        """
+        self.start()
+        self.unpause()
+
+    def show(self, *args, **kwargs):
+        """Syntatic sugar for calling self.sampler.show(*args, **kwargs).
+
+        Returns string describing results.
+        """
+        return self.sampler.show(*args, **kwargs)
+
+    def query(self, *args, **kwargs):
+        """Syntatic sugar for calling self.sampler.query(*args, **kwargs).
+
+        Returns string describing results.
+        """
+        return self.sampler.query(*args, **kwargs)
+
     def set_interval(self, new_interval):
         """Set the interval for how often we take a sample.
 
