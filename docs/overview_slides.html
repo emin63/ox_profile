@@ -210,12 +210,11 @@ Need to periodically look at call stack + record it.
 
 --
   1. Nice to have "portable" implementation.
-
+  
 --
 
   2. Using only python features may be easier to understand/modify.
      - Understandable implementation essential if run in production.
-
 --
 
   3. Consumer software (e.g., games) often run in Windows.
@@ -253,6 +252,10 @@ Then start your python interpreter and:
 ---
 
 # Profiler output
+
+```python
+    >>> profiler.show()
+```
 
 Output shows:
 
@@ -299,7 +302,7 @@ to get an easy way for profiling production code:
   
   - `ox_profile/status`: Shows current profiling status.
 
-
+  - `ox_profile/set_interval`: Set how often we take a sample.
 ---
 
 # Basic theory of using sys._current_frames
@@ -321,12 +324,11 @@ In theory, there is no difference between theory and practice.
 
 ---
 
-# Issues: (thread switching)
+# Using sys._current_frames
 
 In theory, just step through `sys._current_frames()` and record data.
 
 ```python
-        sys.setswitchinterval(10000)
         for dummy_frame_id, frame in (sys._current_frames().items()):
             self.my_db.record(measure_tool(frame))
 ```
@@ -338,14 +340,14 @@ What could go wrong?
 
 ---
 
-# Issues: (thread switching)
+# Using sys._current_frames
 
 In theory, just step through `sys._current_frames()` and record data.
 
 ```python
         switch_interval = sys.getswitchinterval()
-	
         sys.setswitchinterval(10000)
+
         for dummy_frame_id, frame in (sys._current_frames().items()):
             self.my_db.record(measure_tool(frame))
 	    
@@ -361,7 +363,7 @@ Now, what could go wrong?
 
 ---
 
-# Issues: (thread switching)
+# Using sys._current_frames
 
 In theory, just step through `sys._current_frames()` and record data.
 
@@ -388,7 +390,7 @@ Now, what could go wrong?
 
 ---
 
-# Issues: (thread locking)
+# Recording a sample
 
 Use simple function to record a sample in a dictionary:
 
@@ -407,7 +409,7 @@ What could go wrong?
 
 ---
 
-# Issues: (thread locking)
+# Recording a sample
 
 ```python
 
@@ -444,7 +446,7 @@ What could go wrong?
 
 ---
 
-# Concluding Remarks
+# Summary
 
   1. Profiling helps find bottlenecks + improve your code.
 
@@ -455,7 +457,24 @@ What could go wrong?
   4. Key tools are `sys.setprofile`, `sys.settrace`, `sys._current_frames`.
 
   5. Profiling simple in theory but be careful when using threads.
-     - need `try/finally`, thread locks, protect switch interval, etc.
+     - need `try/finally`, thread locks, switch interval, `faulthandler`, etc.
+
+
+---
+
+# Further investigations
+
+  - Slides, `ox_profile`, etc. at https://github.com/emin63/ox_profile
+
+    - Clone, fork, or file issues if you have questions.
+
+  - About presenter:
+
+    - Name: Emin Martinian
+
+    - Role: software, technology, finance consulting at [www.aocks.com](http://www.aocks.com)
+
+    - Contact: emin.martinian@gmail.com
 
   <!-- Things below are to make remark JS work -->
   <!-- See https://github.com/gnab/remark/blob/gh-pages/index.html 
