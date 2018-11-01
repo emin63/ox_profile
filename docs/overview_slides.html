@@ -168,7 +168,7 @@ FIXME
 -->
 
 <!-- use #1 to work around stupid github caching -->
-<img src="images/frame.png#1" style="width: 100%">
+<img src="https://raw.githubusercontent.com/emin63/ox_profile/master/docs/images/frame.png#1" style="width: 100%">
 
 ---
 
@@ -444,6 +444,32 @@ What could go wrong?
      - Cannot get granularity finer than about 1 millisecond.
      
        - Probably OK, but even paranoids have enemies.
+
+---
+
+# Additional Uses
+
+What else can you do with `sys._current_frames()`?
+
+--
+
+Major damage that is very hard to track down! Be careful.
+
+--
+  1. Data snapshot tool: periodically snapshot specific function data
+
+     - Just look at `frame.f_locals` instead of `frame.f_code.co_name`.
+--
+
+     - Can even modify `f_locals`!
+
+--
+  2. Statistical debugger: periodically snapshot full backtrace + locals.
+
+     - Either dump these to logs or store locally and report on "failure".
+
+--
+  3. Statistical code coverage: like `coverage.py`, but in production.
 
 ---
 
