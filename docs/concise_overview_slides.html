@@ -294,9 +294,18 @@ Control overhead based on sampling interval:
 ```
 
   - 5 second sampling = negligable overhead.
-  - May want to also add random jitter.
 
+  - Trade-off between various goals:
+    - accuracy, collection time, overhead
 
+  - May want to also add random jitter
+
+???
+
+Note that if you have a function happening with the same periodicity
+as your sampling interval, you may never "see" that function. Adding
+random jitter can address that as could using finer sampling or even
+dynamically varying sampling time based on CPU load.
 
 ---
 
