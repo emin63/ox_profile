@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="48cm" height="24cm" viewBox="178 61 941 472" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="483.5" y="228.5">
+<svg width="47cm" height="26cm" viewBox="179 26 940 507" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="483.5" y="228.5">
     <tspan x="483.5" y="228.5"></tspan>
   </text>
-  <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="483.5" y="228.5">
+  <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="483.5" y="228.5">
     <tspan x="483.5" y="228.5"></tspan>
   </text>
   <g>
     <rect style="fill: #ffffff" x="180" y="62" width="502" height="177"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="180" y="62" width="502" height="177"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="431" y="155.3">
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="431" y="155.3">
       <tspan x="431" y="155.3"></tspan>
     </text>
   </g>
@@ -25,8 +25,8 @@
   <g>
     <path style="fill: #ffffff" d="M 689.667 280 L 1032.33,280 C 1079.65,280 1118,336.412 1118,406 C 1118,475.588 1079.65,532 1032.33,532 L 689.667,532 C 642.354,532 604,475.588 604,406 C 604,336.412 642.354,280 689.667,280z"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 689.667 280 L 1032.33,280 C 1079.65,280 1118,336.412 1118,406 C 1118,475.588 1079.65,532 1032.33,532 L 689.667,532 C 642.354,532 604,475.588 604,406 C 604,336.412 642.354,280 689.667,280"/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="411">
-      <tspan x="861" y="411"></tspan>
+    <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="861" y="410.8">
+      <tspan x="861" y="410.8"></tspan>
     </text>
   </g>
   <text font-size="22.5778" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="638.9" y="334.8">
@@ -43,10 +43,43 @@
     <polygon style="fill: #000000" points="859.402,278.436 848.759,275.013 854.043,273.189 855.754,267.867 "/>
     <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="859.402,278.436 848.759,275.013 854.043,273.189 855.754,267.867 "/>
   </g>
-  <text font-size="33.8662" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="191" y="326">
+  <text font-size="33.8667" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="191" y="326">
     <tspan x="191" y="326">Can extract profiling</tspan>
     <tspan x="191" y="368.333">information to get function</tspan>
     <tspan x="191" y="410.667">name from co_name,</tspan>
     <tspan x="191" y="453">caller from f_back, etc.</tspan>
   </text>
+  <g>
+    <rect style="fill: #ffffff" x="846" y="28" width="145" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="846" y="28" width="145" height="38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="918.5" y="51.8">
+      <tspan x="918.5" y="51.8">Frame 1</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="845.9" y="67" width="145" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="845.9" y="67" width="145" height="38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="918.4" y="90.8">
+      <tspan x="918.4" y="90.8">Frame 2</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="845.9" y="106" width="145" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="845.9" y="106" width="145" height="38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="918.4" y="129.8">
+      <tspan x="918.4" y="129.8">Frame 3</tspan>
+    </text>
+  </g>
+  <g>
+    <rect style="fill: #ffffff" x="845.9" y="145" width="145" height="38"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="845.9" y="145" width="145" height="38"/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:normal" x="918.4" y="168.8">
+      <tspan x="918.4" y="168.8">Frame 4</tspan>
+    </text>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 845.9,86 A 2468.86,2468.86 0 0 0 690.934,146.631"/>
+    <polygon style="fill: #000000" points="684.05,149.607 691.223,141.031 690.927,146.614 695.215,150.2 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="684.05,149.607 691.223,141.031 690.927,146.614 695.215,150.2 "/>
+  </g>
 </svg>
