@@ -114,29 +114,12 @@ Profiling is useful to find out which parts of program are slow.
 
 ---
 
-# How do we profile?
-
-  - `cProfile`, `profile`: (deterministic)
-
-  - `stat_prof`, `plop`, `pyflame`: (statistical)
-    - Using POSIX timer + ptrace 
-
-  - `pprofile`, `ox_profile`: (statistical)
-    - thread based statistical profilers
-
-
-???
-
-  - lots of others
-
----
-
 class: small-code
 
 # Deterministic Profiling
 
 ```
->>> import cProfile, re
+>>> import cProfile, re  # could also use pure python `profile`
 >>> cProfile.run('re.compile("foo|bar")')
 ```
 
@@ -187,7 +170,22 @@ FIXME
 -->
 
 <!-- use #1 to work around stupid github caching -->
-<img src="https://raw.githubusercontent.com/emin63/ox_profile/master/docs/images/frame.png#1" style="width: 100%">
+<img src="https://raw.githubusercontent.com/emin63/ox_profile/master/docs/images/frame.png#2" style="width: 100%">
+
+---
+
+# Program Diagram
+
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/DetProfPartial.png#1" style="width: 80%">
+
+---
+
+# Program Diagram w/Profiler
+
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/DetProf.png#1" style="width: 80%">
+
 
 ---
 
@@ -210,39 +208,50 @@ Statistical profilers address these issues.
 
 ---
 
-# POSIX timer
+# Statistical Profiler (Main Thread)
+
+
+<!-- use #1 to work around stupid github caching -->
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/SamplerText.png#2" style="width: 80%">
+
+---
+
+# Statistical Profiler (Sampling)
+
+<!-- use #1 to work around stupid github caching -->
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/Sampler.png#2" style="width: 80%">
+
+???
+
+Setup for next slide: what system tools are available for making the
+sampler thread? How do we implment it?
+
+---
+
+# POSIX timer as Sampler
+
+  - Low level timer interrupts your process
 
   - Periodically check call stack + record it.
-
-  - low level timer interrupts your process
 
   - `stat_prof`, `plop` (not available on Windows).
 
 ---
 
-# POSIX ptrace
+# POSIX ptrace as Sampler
 
-  - Periodically check call stack + record it.
+  - Threads via `ptrace`.
 
-  - Threads via `ptrace`:
-   - lets one program control/inspect other.
+  - Lets one program control/inspect other.
+
+  - Main/Sampler are different programs!
 
   - `pyflame` (not available on Windows).
 
 ---
 
-# Python `sys._current_frames`
-
-Periodically check call stack + record it.
-
-  - lists each thread's current frame.
-
-  - `ox_profile`, `pprofile`, (works on windows!)  
-
-  - Very useful function; beware leading `_`
-
-
----
 
 # Why do we care about non-POSIX?
 
@@ -258,6 +267,47 @@ Periodically check call stack + record it.
   3. Consumer software (e.g., games) often run in Windows.
 
 ---
+
+# Python `sys._current_frames`
+
+  - lists each thread's current frame.
+
+  - `ox_profile`, `pprofile`, (works on windows!)
+
+
+<!-- use #1 to work around stupid github caching -->
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/CurFrameF1.png#2" style="width: 60%; display: block; margin-left: auto; margin-right: auto;">
+
+---
+
+
+# `_current_frames` (Function 2)
+
+  - lists each thread's current frame.
+
+  - `ox_profile`, `pprofile`, (works on windows!)
+
+
+<!-- use #1 to work around stupid github caching -->
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/CurFrameF2.png#2" style="width: 60%; display: block; margin-left: auto; margin-right: auto;">
+
+---
+
+# `_current_frames` (Function 3)
+
+  - lists each thread's current frame.
+
+  - `ox_profile`, `pprofile`, (works on windows!)
+
+
+<!-- use #1 to work around stupid github caching -->
+<!-- FIXME put on github not in local file -->
+<img src="file:///c:/cygwin64/home/emin/code/ox_profile/docs/images/CurFrameF3.png#2" style="width: 60%; display: block; margin-left: auto; margin-right: auto;">
+
+---
+
 
 class: medium-code
 
@@ -285,12 +335,31 @@ Then start your python interpreter and:
 
 ---
 
+class: medium-code
+
+# Sampling loop
+
+Oversimplified illustration of sampler loop:
+
+```python
+
+    while 1:
+        time.sleep(self.interval)
+		for id, frame in sys._current_frames().items():
+            self.my_db[frame.f_code.co_name] += 1
+
+```
+
+Sampling loop runs in separate thread.
+
+---
+
 # Sampling Interval
 
 
 Control overhead based on sampling interval:
 ```python
->>> profiler.set_interval(5)
+>>> profiler.set_interval(5)  # changes profiler.interval
 ```
 
   - 5 second sampling = negligable overhead.
@@ -344,26 +413,6 @@ Output shows:
 
 ---
 
-# Using Flask
-
-If you are running a flask web server, do:
-
-```python
-    from ox_profile.ui.flask.views import OX_PROF_BP
-    app.register_blueprint(OX_PROF_BP)
-	app.config['OX_PROF_USERS'] = {<admin_user_1>, <admin_user_2>, ...}
-```
-
-for easy way to profile production code:
-
-  - `ox_profile/unpause`: Start (or unpause)
-  
-  - `ox_profile/pause`: Pause profiler
-
-  - `ox_profile/status`: Shows current results
-
-  - `ox_profile/set_interval`: sample frequency
----
 
 # Basic theory of sys._current_frames
 
@@ -396,7 +445,10 @@ In theory, just step through `sys._current_frames()` and record data.
 What could go wrong?
 
 --
-  - thread context could switch = attempt to read stale frame = **CRASH!**
+  - thread context could switch
+--
+
+    - attempt to read stale frame = **CRASH!**
 
 ---
 
@@ -513,6 +565,12 @@ What could go wrong?
   - Unknown unknowns:
     - use `faulthandler.enable()` at startup
 
+???
+
+Using `faulthandler.enable()` ensures at least a minimal stack trace
+is dumped if program crashes. Helpful in diagnosing weird things
+caused by mucking with stack frames.
+
 ---
 
 class: smaller-slide
@@ -535,6 +593,29 @@ class: smaller-slide
 	  - even paranoids have enemies.
 
 ---
+
+# Using Flask
+
+If you are running a flask web server, do:
+
+```python
+    from ox_profile.ui.flask.views import OX_PROF_BP
+    app.register_blueprint(OX_PROF_BP)
+	app.config['OX_PROF_USERS'] = {<admin_user_1>, <admin_user_2>, ...}
+```
+
+for easy way to profile production code:
+
+  - `ox_profile/unpause`: Start (or unpause)
+  
+  - `ox_profile/pause`: Pause profiler
+
+  - `ox_profile/status`: Shows current results
+
+  - `ox_profile/set_interval`: sample frequency
+
+---
+
 
 class: smaller-slide
 	
