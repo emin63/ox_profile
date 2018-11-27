@@ -442,6 +442,17 @@ In theory, just step through `sys._current_frames()` and record data.
             self.my_db.record(measure_tool(frame))
 ```
 
+
+???
+
+Minor note: instead of having self.my_db as a dict, we have two levels of indirection:
+
+  1. self.my_db is an object and we call record method
+  2. call measure_tool on frame to extract relevant data for full backtrace
+
+
+--
+
 What could go wrong?
 
 --
@@ -449,7 +460,6 @@ What could go wrong?
 --
 
     - attempt to read stale frame = **CRASH!**
-
 ---
 
 class: smaller-slide
