@@ -10,6 +10,13 @@ class Measurement(object):
 
     One important thing the Measurement instance must do is take
     a stack frame and map it to a unique name using the `snap` method.
+    The name of the measurement is basically the full stack backtrace.
+    Thus measurements with the same stack backtrace will have the same
+    name (so we can count how often they occur).
+
+    Note that the `query` method in the `CountingRecorder` class takes
+    apart the name into the list of functions for the backtrace and
+    records a hit for each of those. See the `query` method for details.
     """
 
     def __init__(self, frame):
