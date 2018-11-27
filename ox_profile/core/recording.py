@@ -73,7 +73,12 @@ class CountingRecorder(object):
 
         ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
-        PURPOSE:   Query the database.
+        PURPOSE:   Query the database. One slightly tricky thing to keep
+                   in mind here is that name of a record is the semi-colon
+                   separated list of functions for the backtrace of a
+                   function. To make sure to count each function call,
+                   we take apart the name into the backtrace and record
+                   a hit for everything in the backtrace.
 
         """
         regexp = re.compile(re_filter)
