@@ -6,6 +6,8 @@ flask blueprint so that you can start/stop/analyze profiling from
 within your application. You can also run the profiler stand-alone
 without `Flask` as well.
 
+To learn more, you can browse the overview slides as [http://htmlpreview.github.io/?https://github.com/emin63/ox_profile/blob/master/docs/overview_slides.html](an HTML/javascript slideshow) or in [PDF form](https://github.com/emin63/ox_profile/blob/master/docs/overview_slides.pdf) or read more details below.
+
 # Why statistical profiling (and why ox_profile)?
 
 Python contains many profilers which instrument your code and give you
