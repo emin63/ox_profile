@@ -5,16 +5,17 @@
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
-      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Sans:400,700,400italic);
       @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
 
-      body { font-family: 'Droid Serif'; }
+      body { font-family: 'Droid Sans'; }
       h1, h2, h3 {
         font-family: 'Yanone Kaffeesatz';
         font-weight: normal;
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
 
+      /* can modify font size by adjusting items below */
       .remark-slide-content { font-size: 30px; }
 
       .smaller-slide { font-size: 28px; }      
@@ -62,12 +63,63 @@
         width: 45%;
         float: right;
         padding-top: 1em;
-      }            
+      }
+
+/* Header/Footer stuff */
+      div.my-header {
+
+      background-color: #F77A00;
+      background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ffb76b), color-stop(0%,#ffa73d), color-stop(0%,#ffffff), color-stop(14%,#ffffff), color-stop(30%,#F77A00), color-stop(100%,#F77A00));
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      height: 30px;
+      width: 100%;
+      text-align: left;
+}
+
+div.my-footer {
+      /*
+      background-color: #F77A00;
+      */
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+    height: 45px;
+      width: 100%;
+      }
+
+div.my-footer span {
+    font-size: 20pt;
+    position: absolute;
+    left: 15px;
+    bottom: 10px;
+      }
+
+div.my-header span {
+    font-size: 20pt;
+    position: absolute;
+    left: 15px;
+    bottom: 2px;
+}            
     </style>
   </head>
   <body>
     <textarea id="source">
 
+layout: true
+<div class="my-header">
+  <span>Statistical Profiling</span>
+  <!-- The following could be used to have an image in header -->
+  <!--
+  <img src="images/logo_tiny.png" style="height: 30px;"/>
+  -->
+</div>
+<div class="my-footer">
+  <span>https://github.com/emin63/ox_profile</span>
+</div>      
+
+---
 
 class: center, middle
 
@@ -77,6 +129,7 @@ class: center, middle
 
 
 ---
+
 # Outline
 
   1. Why statistical profiling?
@@ -438,7 +491,7 @@ In theory, there is no difference between theory and practice.
 
 # Using sys._current_frames
 
-In theory, just step through `sys._current_frames()` and record data.
+In theory, iter `sys._current_frames()` + record.
 
 ```python
         for dummy_frame_id, frame in (sys._current_frames().items()):
@@ -469,7 +522,7 @@ class: smaller-slide
 	
 # Using sys._current_frames
 
-In theory, just step through `sys._current_frames()` and record data.
+In theory, iter `sys._current_frames()` + record.
 
 ```python
 *       switch_interval = sys.getswitchinterval()
@@ -494,7 +547,7 @@ class: smaller-slide
 	
 # Using sys._current_frames
 
-In theory, just step through `sys._current_frames()` and record data.
+In theory, iter `sys._current_frames()` + record.
 
 ```python
         switch_interval = sys.getswitchinterval()
