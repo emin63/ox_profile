@@ -137,7 +137,7 @@ class CountingRecorder(object):
         else:
             note = ''
         width = 40
-        fmt = '%s {:%i} %s {:^8} %s {:5} %s' % (col, width, col, col, col)
+        fmt = '%s {:%i} %s {:>8} %s {:>5} %s' % (col, width, col, col, col)
         header = fmt.format('Function', 'Hits', '%')
         if sep:
             line_sep = '\n  ' + (sep * len(header)) + '\n  '
