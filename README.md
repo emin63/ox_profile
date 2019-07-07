@@ -59,7 +59,7 @@ something like:
     >>> from ox_profile.core.launchers import SimpleLauncher
     >>> profiler = SimpleLauncher.launch()      # Create and start a profiler.
     >>> # call some functions
-    >>> print(profiler.show())                  # Print current results in preformmated way.
+    >>> print(profiler.show())                  # Print current results in preformated way.
     >>> profiler.cancel()                       # Turns off the profiler for good.
 ```
 
