@@ -8,8 +8,8 @@ flask blueprint so that you can start/stop/analyze profiling from within
 your application. You can also run the profiler stand-alone without
 ``Flask`` as well.
 
-Why statistical profiling?
-==========================
+Why statistical profiling (and why ox\_profile)?
+================================================
 
 Python contains many profilers which instrument your code and give you
 exact results. A main benefit here is you know *exactly* what your
@@ -21,6 +21,29 @@ doing with an overhead that can be tuned as desired.
 One main use case for ``ox_profile`` specifically (and statistical
 profiling in general) is that you can apply it to a production server to
 see how things work "in the wild".
+
+There are other statistical profilers out there for python (such as
+statprof), which are pretty good and may be better for your needs than
+``ox_profile``. So why would you consider ``ox_profile``? Some possible
+reasons include:
+
+1. Works on non-UNIX systems (e.g., works on Windows).
+
+   -  Many other statistical profilers use various excellent features of
+      LINUX or UNIX while ``ox_profile`` only really relies on the
+      python ``sys._current_frames`` method.
+
+2. Simple to understand.
+
+   -  The code for ``ox_profile`` is fairly simple. The main work is
+      really inside ``ox_profile.core.sampling.Sampler`` so it is easy
+      to reason about or modify if you need slightly different
+      profiling.
+
+3. Flask Blueprint provided.
+
+   -  If you are using Flask, then you can register the ``ox_profile``
+      blueprint and easily get statistical profiling in your flask app.
 
 Usage
 =====
@@ -104,7 +127,7 @@ less robust. Indeed, the documentation says "This function should be
 used for specialized purposes only." Hopefully the core python
 developers will not make major changes to such a useful function.
 
-In any case, the most interestig class is the ``Sampler`` class in the
+In any case, the most interesting class is the ``Sampler`` class in the
 ``ox_profile.core.sampling`` module. This class has a run method which
 does the following:
 
@@ -132,7 +155,7 @@ itself because it just tells you that ``foo`` is being run. It could be
 useful if there were other threads which were running because the
 sampler would tell you what stack frame those threads were in.
 
-In princple, you could just call the ``Sampler.run`` method to track
+In principle, you could just call the ``Sampler.run`` method to track
 other threads but that still isn't very convenient. To make things easy
 to use, we provide the ``SimpleLauncher`` class in the
 ``ox_profile.core.launchers`` module as shown in the Usage section. The
