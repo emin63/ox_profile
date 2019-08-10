@@ -51,11 +51,9 @@ class Measurement(object):
 
         """
         stack = []
-        self.name = '{}({})'.format(frame.f_code.co_name,
-                                    frame.f_globals.get('__name__'))
+        self.name = '%s(%s)' % (frame.f_code.co_name, frame.f_globals.get('__name__'))
         while frame is not None:
-            formatted_frame = '{}({})'.format(frame.f_code.co_name,
-                                              frame.f_globals.get('__name__'))
+            formatted_frame = '%s(%s)' % (frame.f_code.co_name, frame.f_globals.get('__name__'))
             stack.append(formatted_frame)
             frame = frame.f_back
 

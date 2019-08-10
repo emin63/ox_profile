@@ -55,14 +55,14 @@ of this class.
         self.my_db = my_db
 
     def show(self, *args, **kwargs):
-        """Syntatic sugar self.my_db.show(*args, **kwargs) to show results.
+        """Syntactic sugar self.my_db.show(*args, **kwargs) to show results.
 
         Returns a string describing collected data.
         """
         return self.my_db.show(*args, **kwargs)
 
     def query(self, *args, **kwargs):
-        """Syntatic sugar self.my_db.query(*args, **kwargs) to query results.
+        """Syntactic sugar self.my_db.query(*args, **kwargs) to query results.
 
         Returns a string describing collected data.
         """
@@ -82,7 +82,6 @@ of this class.
                   take different kinds of measurements.
 
         """
-        dummy = self
         return metrics.Measurement
 
     def run(self):
@@ -106,7 +105,7 @@ of this class.
         logging.debug('Switch interval now %.2f', sys.getswitchinterval())
 
     def __call__(self, *args, **kwargs):
-        "Syntactic sugar to call `self.run(*args, **kwargs)`."
+        """Syntactic sugar to call `self.run(*args, **kwargs)`."""
 
         return self.run(*args, **kwargs)
 

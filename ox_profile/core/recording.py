@@ -1,33 +1,13 @@
-"""Module for recording and saving measuremnts.
+"""Module for recording and saving measurements.
 """
 
 import re
 import threading
+from collections import defaultdict, namedtuple, Counter
 
 
-class ProfileRecord(object):
-    """Simple record to track how many times a function/path is called.
-    """
-
-    def __init__(self, name, hits):
-        """Initializer.
-
-        :param name:   String name of function or stack path.
-
-        :param hits:   Number of times it is called.
-        """
-        self.name = name
-        self.hits = hits
-
-    def to_str(self):
-        "Return string reprsentation."
-        result = '%s(%s=%s, %s=%s)' % (
-            self.__class__.__name__, 'name', self.name, 'hits', self.hits)
-
-        return result
-
-    def __repr__(self):
-        return self.to_str()
+# Simple record to track how many times a function/path is called.
+ProfileRecord = namedtuple('ProfileRecord', 'name, hits')
 
 
 class CountingRecorder(object):
@@ -37,12 +17,12 @@ class CountingRecorder(object):
     def __init__(self):
         self.db_lock = threading.Lock()
         with self.db_lock:
-            self.my_db = {}
+            self.my_db = defaultdict(lambda: 0)
 
     def record(self, measurement):
         """Record a measurement.
 
-        :param measurement:     An ox_profile.core.metrics.Meaasurement
+        :param measurement:     An ox_profile.core.metrics.Measurement
                                 for profiling the program.
 
         ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
@@ -52,8 +32,7 @@ class CountingRecorder(object):
 
         """
         with self.db_lock:
-            record = self.my_db.get(measurement.name, 0)
-            self.my_db[measurement.name] = record + 1
+            self.my_db[measurement.name] += 1
 
     def query(self, re_filter='.*', max_records=10):
         """Query the database of measurements.
@@ -82,7 +61,7 @@ class CountingRecorder(object):
 
         """
         regexp = re.compile(re_filter)
-        calls = {}
+        calls_counter = Counter()
         # Lock so we don't mess with db during query.
         # *IMPORTANT: be careful in code below to not do anything to
         # call self.record or anything else which would try to acquire
@@ -94,11 +73,9 @@ class CountingRecorder(object):
                 name_list = name.split(';')
                 for fname in name_list:
                     if regexp.search(fname):
-                        calls[fname] = calls.get(fname, 0) + item
-            my_hits = list(reversed(sorted(calls.items(),
-                                           key=lambda pair: pair[1])))
-            result = [ProfileRecord(name, hits) for name, hits in my_hits[
-                :max_records]]
+                        calls_counter[fname] += item
+            my_hits = calls_counter.most_common(max_records)
+            result = [ProfileRecord(name, hits) for name, hits in my_hits]
             return result, num_records
 
     def show(self, limit=10, query=None, sep='-', col='|'):
@@ -144,7 +121,7 @@ class CountingRecorder(object):
         else:
             line_sep = '\n'
         text = ('Profiling results:%s\n%s' % (note, line_sep)) + (
-            header + line_sep) + (line_sep).join([fmt.format(
+            header + line_sep) + line_sep.join([fmt.format(
                 i.name[:width], i.hits, '%.1f' % (100*(i.hits/total_hits)))
                                                   for i in query]) + line_sep
 

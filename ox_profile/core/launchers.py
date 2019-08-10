@@ -14,7 +14,7 @@ class SamplingTracker:
     """Simple class to track how often we sample things.
 
     This class is meant to track how often we take samples. Since we are
-    doing stastitical profiling, the interval between samples is random
+    doing statistical profiling, the interval between samples is random
     and can be affected by many things. The SamplingTracker is used
     to follow that.
 
@@ -28,7 +28,7 @@ class SamplingTracker:
         self.wait_sq = 0.0
 
     def reset(self):
-        "Reset everything in the tracker."
+        """ Reset everything in the tracker."""
         self.calls = 0
         self.wait = 0.0
         self.wait_sq = 0.0
@@ -45,7 +45,7 @@ class SamplingTracker:
         self.wait_sq += my_wait**2
 
     def stats(self):
-        "Return dictionary of stats related to snap interval."
+        """Return dictionary of stats related to snap interval."""
         if self.calls == 0:
             return 'No samples taken'
 
@@ -112,7 +112,7 @@ Items:
         ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
 
         PURPOSE:      The profiler is basically running as a daemon thread
-                      and continusly
+                      and continuously
 
         """
         self.tracker = SamplingTracker()
@@ -129,7 +129,7 @@ Items:
 
     @classmethod
     def launch(cls):
-        """Syntatic sugar for calling s=cls(), s.start() then s.unpause().
+        """Syntactic sugar for calling s=cls(), s.start() then s.unpause().
         """
         result = cls()
         result.start()
@@ -137,14 +137,14 @@ Items:
         return result
 
     def show(self, *args, **kwargs):
-        """Syntatic sugar for calling self.sampler.show(*args, **kwargs).
+        """Syntactic sugar for calling self.sampler.show(*args, **kwargs).
 
         Returns string describing results.
         """
         return self.sampler.show(*args, **kwargs)
 
     def query(self, *args, **kwargs):
-        """Syntatic sugar for calling self.sampler.query(*args, **kwargs).
+        """Syntactic sugar for calling self.sampler.query(*args, **kwargs).
 
         Returns string describing results.
         """
@@ -154,9 +154,9 @@ Items:
         """Set the interval for how often we take a sample.
 
         :arg new_interval:  Float between 0 and 10 for how long to
-                            wait beteeen samples.
+                            wait between samples.
         """
-        assert new_interval > 0 and new_interval < 10
+        assert 0 < new_interval < 10
         self.interval = new_interval
         self.tracker.reset()
 
