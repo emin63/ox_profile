@@ -6,8 +6,29 @@ import threading
 from collections import defaultdict, namedtuple, Counter
 
 
-# Simple record to track how many times a function/path is called.
-ProfileRecord = namedtuple('ProfileRecord', 'name, hits')
+class ProfileRecord(object):
+    """Simple record to track how many times a function/path is called.
+    """
+
+    def __init__(self, name, hits):
+        """Initializer.
+
+        :param name:   String name of function or stack path.
+
+        :param hits:   Number of times it is called.
+        """
+        self.name = name
+        self.hits = hits
+
+    def to_str(self):
+        """Return string reprsentation."""
+        result = '%s(%s=%s, %s=%s)' % (
+            self.__class__.__name__, 'name', self.name, 'hits', self.hits)
+
+        return result
+
+    def __repr__(self):
+        return self.to_str()
 
 
 class CountingRecorder(object):
