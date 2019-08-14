@@ -6,6 +6,9 @@ import threading
 from collections import defaultdict, Counter
 
 
+RE_FILTER_ALL_CHARACTERS = '.*'
+
+
 class ProfileRecord(object):
     """Simple record to track how many times a function/path is called.
     """
@@ -55,7 +58,7 @@ class CountingRecorder(object):
         with self.db_lock:
             self.my_db[measurement.name] += 1
 
-    def query(self, re_filter='.*', max_records=10):
+    def query(self, re_filter=RE_FILTER_ALL_CHARACTERS, max_records=10):
         """Query the database of measurements.
 
         :param re_filter='.*':      String regular expression for records
@@ -81,7 +84,10 @@ class CountingRecorder(object):
                    a hit for everything in the backtrace.
 
         """
-        regexp = re.compile(re_filter)
+        if re_filter in (None, RE_FILTER_ALL_CHARACTERS):
+            regexp = None
+        else:
+            regexp = re.compile(re_filter)
         calls_counter = Counter()
         # Lock so we don't mess with db during query.
         # *IMPORTANT: be careful in code below to not do anything to
@@ -93,7 +99,7 @@ class CountingRecorder(object):
             for name, item in list(self.my_db.items()):
                 name_list = name.split(';')
                 for fname in name_list:
-                    if regexp.search(fname):
+                    if not regexp or regexp.search(fname):
                         calls_counter[fname] += item
             my_hits = calls_counter.most_common(max_records)
             result = [ProfileRecord(name, hits) for name, hits in my_hits]
