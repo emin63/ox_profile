@@ -3,7 +3,7 @@
 
 import re
 import threading
-from collections import defaultdict, namedtuple, Counter
+from collections import defaultdict, Counter
 
 
 class ProfileRecord(object):
