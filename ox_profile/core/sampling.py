@@ -31,6 +31,7 @@ class Freezer(object):
         logging.debug('Process sampling')
         self._stored_interval_value = self._get_interval()
         self._set_interval(self._freezed_interval_value)
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._set_interval(self._stored_interval_value)
