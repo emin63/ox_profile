@@ -8,6 +8,35 @@ import sys
 from ox_profile.core import metrics
 
 
+class Freezer(object):
+    """
+    Muck with switch/check interval to prevent thread context switching while
+    trying to capture profiling information for safety
+    """
+    def __init__(self):
+        if sys.version[:3] >= "3.2":
+            # https://docs.python.org/3/library/sys.html#sys.setswitchinterval
+            self._get_interval = sys.getswitchinterval
+            self._set_interval = sys.setswitchinterval
+            self._freezed_interval_value = 1000
+            self._log_msg_template = "Switch interval now %.2f"
+        else:
+            # https://docs.python.org/3/library/sys.html#sys.getcheckinterval
+            self._get_interval = sys.getcheckinterval
+            self._set_interval = sys.setcheckinterval
+            self._freezed_interval_value = 1000
+            self._log_msg_template = "Check interval now %.2f"
+
+    def __enter__(self):
+        logging.debug('Process sampling')
+        self._stored_interval_value = self._get_interval()
+        self._set_interval(self._freezed_interval_value)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._set_interval(self._stored_interval_value)
+        logging.debug(self._log_msg_template, self._stored_interval_value)
+
+
 class Sampler(object):
     """Basic class to sample program for statistical profiling.
 
@@ -51,8 +80,9 @@ of this class.
 
     """
 
-    def __init__(self, my_db):
+    def __init__(self, my_db, freezer=None):
         self.my_db = my_db
+        self.freezer = freezer or Freezer()
 
     def show(self, *args, **kwargs):
         """Syntatic sugar self.my_db.show(*args, **kwargs) to show results.
@@ -90,20 +120,11 @@ of this class.
         """
         measure_tool = self.get_measure_tool()
 
-        # Muck with switch interval to prevent thread context switching while
-        # trying to capture profiling information for safety
-
-        switch_interval = sys.getswitchinterval()
-        try:
-            logging.debug('Process sampling')
-            sys.setswitchinterval(10000)
+        with self.freezer:
             for dummy_frame_id, frame in (
                     sys._current_frames(  # pylint: disable=protected-access
                         ).items()):
                 self.my_db.record(measure_tool(frame))
-        finally:
-            sys.setswitchinterval(switch_interval)
-        logging.debug('Switch interval now %.2f', sys.getswitchinterval())
 
     def __call__(self, *args, **kwargs):
         "Syntactic sugar to call `self.run(*args, **kwargs)`."
