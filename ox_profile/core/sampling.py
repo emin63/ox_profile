@@ -3,6 +3,7 @@
 
 import doctest
 import logging
+import platform
 import sys
 
 from ox_profile.core import metrics
@@ -14,7 +15,7 @@ class Freezer(object):
     trying to capture profiling information for safety
     """
     def __init__(self):
-        if sys.version[:3] >= "3.2":
+        if platform.python_version() >= "3.2.0":
             # https://docs.python.org/3/library/sys.html#sys.setswitchinterval
             self._get_interval = sys.getswitchinterval
             self._set_interval = sys.setswitchinterval
