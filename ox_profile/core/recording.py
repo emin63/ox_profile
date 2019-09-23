@@ -1,8 +1,12 @@
-"""Module for recording and saving measuremnts.
+"""Module for recording and saving measurements.
 """
 
 import re
 import threading
+from collections import defaultdict, Counter
+
+
+RE_FILTER_ALL_CHARACTERS = '.*'
 
 
 class ProfileRecord(object):
@@ -20,7 +24,7 @@ class ProfileRecord(object):
         self.hits = hits
 
     def to_str(self):
-        "Return string reprsentation."
+        """Return string reprsentation."""
         result = '%s(%s=%s, %s=%s)' % (
             self.__class__.__name__, 'name', self.name, 'hits', self.hits)
 
@@ -37,12 +41,12 @@ class CountingRecorder(object):
     def __init__(self):
         self.db_lock = threading.Lock()
         with self.db_lock:
-            self.my_db = {}
+            self.my_db = defaultdict(lambda: 0)
 
     def record(self, measurement):
         """Record a measurement.
 
-        :param measurement:     An ox_profile.core.metrics.Meaasurement
+        :param measurement:     An ox_profile.core.metrics.Measurement
                                 for profiling the program.
 
         ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-
@@ -52,10 +56,9 @@ class CountingRecorder(object):
 
         """
         with self.db_lock:
-            record = self.my_db.get(measurement.name, 0)
-            self.my_db[measurement.name] = record + 1
+            self.my_db[measurement.name] += 1
 
-    def query(self, re_filter='.*', max_records=10):
+    def query(self, re_filter=RE_FILTER_ALL_CHARACTERS, max_records=10):
         """Query the database of measurements.
 
         :param re_filter='.*':      String regular expression for records
@@ -81,8 +84,11 @@ class CountingRecorder(object):
                    a hit for everything in the backtrace.
 
         """
-        regexp = re.compile(re_filter)
-        calls = {}
+        if re_filter in (None, RE_FILTER_ALL_CHARACTERS):
+            regexp = None
+        else:
+            regexp = re.compile(re_filter)
+        calls_counter = Counter()
         # Lock so we don't mess with db during query.
         # *IMPORTANT: be careful in code below to not do anything to
         # call self.record or anything else which would try to acquire
@@ -93,12 +99,10 @@ class CountingRecorder(object):
             for name, item in list(self.my_db.items()):
                 name_list = name.split(';')
                 for fname in name_list:
-                    if regexp.search(fname):
-                        calls[fname] = calls.get(fname, 0) + item
-            my_hits = list(reversed(sorted(calls.items(),
-                                           key=lambda pair: pair[1])))
-            result = [ProfileRecord(name, hits) for name, hits in my_hits[
-                :max_records]]
+                    if not regexp or regexp.search(fname):
+                        calls_counter[fname] += item
+            my_hits = calls_counter.most_common(max_records)
+            result = [ProfileRecord(name, hits) for name, hits in my_hits]
             return result, num_records
 
     def show(self, limit=10, query=None, sep='-', col='|'):
@@ -144,7 +148,7 @@ class CountingRecorder(object):
         else:
             line_sep = '\n'
         text = ('Profiling results:%s\n%s' % (note, line_sep)) + (
-            header + line_sep) + (line_sep).join([fmt.format(
+            header + line_sep) + line_sep.join([fmt.format(
                 i.name[:width], i.hits, '%.1f' % (100*(i.hits/total_hits)))
                                                   for i in query]) + line_sep
 
