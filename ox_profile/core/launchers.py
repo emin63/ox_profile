@@ -124,6 +124,7 @@ Items:
         self.unpaused = threading.Event()
         self.pause()
         threading.Thread.__init__(self, *args, **kwargs)
+        self.name = "ox_rofiler_SimpleLauncher_Thread"
         self.daemon = True
         assert self.isDaemon()
 

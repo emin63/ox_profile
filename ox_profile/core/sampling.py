@@ -17,21 +17,23 @@ class Freezer(object):
     def __init__(self):
         if platform.python_version() >= "3.2.0":
             # https://docs.python.org/3/library/sys.html#sys.setswitchinterval
+            # New in version 3.2.
             self._get_interval = sys.getswitchinterval
             self._set_interval = sys.setswitchinterval
-            self._freezed_interval_value = 1000
+            self._interval = 10000  # number of seconds to wait
             self._log_msg_template = "Switch interval now %.2f"
         else:
-            # https://docs.python.org/3/library/sys.html#sys.getcheckinterval
+            # https://docs.python.org/3/library/sys.html#sys.setcheckinterval
+            # Deprecated since version 3.2
             self._get_interval = sys.getcheckinterval
             self._set_interval = sys.setcheckinterval
-            self._freezed_interval_value = 1000
+            self._interval = 100000  # number of instructions to wait
             self._log_msg_template = "Check interval now %.2f"
 
     def __enter__(self):
         logging.debug('Process sampling')
         self._stored_interval_value = self._get_interval()
-        self._set_interval(self._freezed_interval_value)
+        self._set_interval(self._interval)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -51,7 +53,7 @@ developers will not make major changes to such a useful function.
 
 The most interesting method is `run` which:
 
-  1. Uses `sys.setswitchinterval` to try and prevent a thread context switch.
+  1. Calls `Freezer` to try and prevent a thread context switch.
   2. Calls `sys._current_frames` to sample what the python interpreter is
      doing.
   3. Updates a simple in-memory database of what functions are running.
