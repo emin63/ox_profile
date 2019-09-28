@@ -3,9 +3,42 @@
 
 import doctest
 import logging
+import platform
 import sys
 
 from ox_profile.core import metrics
+
+
+class Freezer(object):
+    """
+    Muck with switch/check interval to prevent thread context switching while
+    trying to capture profiling information for safety
+    """
+    def __init__(self):
+        if platform.python_version() >= "3.2.0":
+            # https://docs.python.org/3/library/sys.html#sys.setswitchinterval
+            # New in version 3.2.
+            self._get_interval = sys.getswitchinterval
+            self._set_interval = sys.setswitchinterval
+            self._interval = 10000  # number of seconds to wait
+            self._log_msg_template = "Switch interval now %.2f"
+        else:
+            # https://docs.python.org/3/library/sys.html#sys.setcheckinterval
+            # Deprecated since version 3.2
+            self._get_interval = sys.getcheckinterval
+            self._set_interval = sys.setcheckinterval
+            self._interval = 100000  # number of instructions to wait
+            self._log_msg_template = "Check interval now %.2f"
+
+    def __enter__(self):
+        logging.debug('Process sampling')
+        self._stored_interval_value = self._get_interval()
+        self._set_interval(self._interval)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._set_interval(self._stored_interval_value)
+        logging.debug(self._log_msg_template, self._stored_interval_value)
 
 
 class Sampler(object):
@@ -20,7 +53,7 @@ developers will not make major changes to such a useful function.
 
 The most interesting method is `run` which:
 
-  1. Uses `sys.setswitchinterval` to try and prevent a thread context switch.
+  1. Calls `Freezer` to try and prevent a thread context switch.
   2. Calls `sys._current_frames` to sample what the python interpreter is
      doing.
   3. Updates a simple in-memory database of what functions are running.
@@ -51,8 +84,9 @@ of this class.
 
     """
 
-    def __init__(self, my_db):
+    def __init__(self, my_db, freezer=None):
         self.my_db = my_db
+        self.freezer = freezer or Freezer()
 
     def show(self, *args, **kwargs):
         """Syntactic sugar self.my_db.show(*args, **kwargs) to show results.
@@ -89,20 +123,11 @@ of this class.
         """
         measure_tool = self.get_measure_tool()
 
-        # Muck with switch interval to prevent thread context switching while
-        # trying to capture profiling information for safety
-
-        switch_interval = sys.getswitchinterval()
-        try:
-            logging.debug('Process sampling')
-            sys.setswitchinterval(10000)
+        with self.freezer:
             for dummy_frame_id, frame in (
                     sys._current_frames(  # pylint: disable=protected-access
                         ).items()):
                 self.my_db.record(measure_tool(frame))
-        finally:
-            sys.setswitchinterval(switch_interval)
-        logging.debug('Switch interval now %.2f', sys.getswitchinterval())
 
     def __call__(self, *args, **kwargs):
         """Syntactic sugar to call `self.run(*args, **kwargs)`."""
