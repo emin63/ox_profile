@@ -104,7 +104,11 @@ app:
         app.config['OX_PROF_USERS'] = {<admin_user_1>, <admin_user_2>, ...}
 
 where ``<admin_user_>``, etc. are strings referring to users who are
-allowed to access ``ox_profile``.
+allowed to access ``ox_profile``. By default, we check
+``current_user.name``, but you can set the ``OX_PROF_USERNAME_FIELD`` in
+``app.config`` to something else (e.g., ``'email'`` to choose which
+field of ``current_user`` is checked against the sequence of strings in
+``OX_PROF_USERS``.
 
 Pointing your browser to the route ``/ox_profile/status`` will then show
 you the profiling status. By default, ``ox_profile`` starts out paused
