@@ -28,12 +28,14 @@ def access_problem_p():
     users.
     """
     allowed = current_app.config.get('OX_PROF_USERS', {})
-    user = current_user.name
-    if user in allowed:
+    name_field = current_app.config.get(
+        'OX_PROF_USERNAME_FIELD', 'name')
+    effective_username = getattr(current_user, name_field)
+    if effective_username in allowed:
         return None
 
-    msg = 'Current user %s not in the %i allowed ox profile users.%s' % (
-        user, len(allowed),
+    msg = 'Current user.%s = %s not in the %i allowed ox profile users.%s' % (
+        effective_username, name_field, len(allowed),
         '\nConfigure app.config["OX_PROF_USERS"] if necessary.')
     return render_template('ox_prof_err.html', error_msg=msg)
 
@@ -171,6 +173,8 @@ def monitor_route_completion(exception=None):
 @login_required
 @restrict_access
 def show_req_times():
+    """Show statistical summary of request times for each route.
+    """
     reqs = OX_PROF_BP.get_reqs()
     if int(request.args.get('as_csv', 0)):
         return _make_csv_response('reqs.csv', reqs)
