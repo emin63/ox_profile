@@ -87,7 +87,7 @@ shown below:
         >>> profiler.pause()                         # You can pause if done profiling or leave running
         >>> query, total_records = profiler.query()  # Query for what the profiler has found
         >>> info = ['%s: %s' % (i.name, i.hits) for i in query]
-        >>> print('Items in query:\n  - %s' % (('\n  - '.join(info))))
+        >>> print('Items in query:  - %s' % (('  - '.join(info))))
         >>> profiler.cancel()                        # This turns off the profiler for good
 
 With Flask

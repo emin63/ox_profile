@@ -15,7 +15,9 @@ class Freezer(object):
     trying to capture profiling information for safety
     """
     def __init__(self):
-        if platform.python_version() >= "3.2.0":
+        python_version_list = [
+            int(i) for i in platform.python_version().split('.')]
+        if python_version_list >= [3, 2, 0]:
             # https://docs.python.org/3/library/sys.html#sys.setswitchinterval
             # New in version 3.2.
             self._get_interval = sys.getswitchinterval
