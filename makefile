@@ -6,7 +6,8 @@ help:
 	@echo "Use make pypi to push to pypi."
 
 pypi: README.rst ox_profile/__init__.py
-	 python3 setup.py sdist upload -r pypi
+	python3 setup.py sdist
+	twine upload -r pypi dist/*
 
 README.rst: README.md
 	pandoc --from=markdown --to=rst --output=README.rst README.md
