@@ -16,7 +16,7 @@ def get_readme():
     'Get the long description from the README file'
 
     here = path.abspath(path.dirname(__file__))
-    with open(path.join(here, 'README.rst')) as my_fd:
+    with open(path.join(here, 'README.md')) as my_fd:
         result = my_fd.read()
 
     return result
@@ -26,6 +26,7 @@ setup(
     version='0.2.8',
     description='Tools for statistical profiling.',
     long_description=get_readme(),
+    long_description_content_type='text/markdown',
     url='http://github.com/emin63/ox_profile',
     author='Emin Martinian',
     author_email='emin.martinian@gmail.com',
