@@ -5,7 +5,10 @@ Copyright (c) 2017, Emin Martinian
 See LICENSE at the top-level of this distribution for more information.
 """
 
-# see also setup.cfg
+# *IMPORTANT*:  While pyproject.toml is supposedly the new standard,
+# *IMPORTANT*:  it is much more complicated to get working with
+# *IMPORTANT*:  anything slightly non-standard (e.g. flat-layout).
+# *IMPORTANT*:  Therefore we package just using setup.py.
 
 from os import path
 
@@ -23,7 +26,7 @@ def get_readme():
 
 setup(
     name='ox_profile',
-    version='0.2.8',
+    version='0.2.14',
     description='Tools for statistical profiling.',
     long_description=get_readme(),
     long_description_content_type='text/markdown',
@@ -47,7 +50,7 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.
     package_data={
-        'sample': ['package_data.dat'],
+        'ox_profile': ['**/*.html'],
     },
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow

@@ -1,15 +1,23 @@
 
-.PHONY: pypi help
+.PHONY: pypi help test_pypi clean
 
 help:
 	@echo "This is a makefile to push to pypi."
 	@echo "Use make pypi to push to pypi."
 
-pypi: README.md ox_profile/__init__.py
-	python3 setup.py sdist
-	twine upload --verbose -r pypi dist/*
+clean:
+	\rm -rf dist *.egg-info
 
-ox_profile/__init__.py: README.rst
-	echo '"""' > ox_profile/__init__.py
-	cat README.md >> ox_profile/__init__.py
-	echo '"""' >> ox_profile/__init__.py
+test_pypi:
+	python3 -m twine upload --verbose --repository testpypi dist/*
+
+pypi:   dist
+	python3 -m twine upload --verbose dist/*
+
+# Wheel is broken since it does not include html files
+dist:
+	python3 -m build --sdist
+
+
+update:
+	pip install --upgrade setuptools wheel twine build packaging
